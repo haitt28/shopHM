@@ -1,0 +1,197 @@
+create table brand
+(
+    id          bigint auto_increment
+        primary key,
+    created_at  datetime(6)  null,
+    description varchar(255) null,
+    modified_at datetime(6)  null,
+    name        varchar(255) not null,
+    status      tinyint(1)   null,
+    thumbnail   varchar(255) null,
+    constraint UK_rdxh7tq2xs66r485cc8dkxt77
+        unique (name)
+);
+
+create table category
+(
+    id          bigint auto_increment
+        primary key,
+    created_at  datetime(6)  null,
+    modified_at datetime(6)  null,
+    name        varchar(300) not null,
+    orders      int          null,
+    slug        varchar(255) not null,
+    status      tinyint(1)   null
+);
+
+create table coupon
+(
+    id                     bigint auto_increment
+        primary key,
+    coupon_code            varchar(255) null,
+    created_at             datetime(6)  null,
+    discount_type          int          null,
+    discount_value         bigint       null,
+    expired_at             datetime(6)  null,
+    is_active              tinyint(1)   null,
+    is_public              tinyint(1)   null,
+    maximum_discount_value bigint       null,
+    name                   varchar(300) not null,
+    constraint UK_sre2vcap4vs6qucaksomk3c7s
+        unique (coupon_code)
+);
+
+create table product
+(
+    id             varchar(255) not null
+        primary key,
+    created_at     datetime(6)  null,
+    description    text         null,
+    image_feedback json         null,
+    images         json         null,
+    modified_at    datetime(6)  null,
+    name           varchar(300) not null,
+    price          bigint       null,
+    sale_price     bigint       null,
+    slug           varchar(255) not null,
+    status         int          null,
+    total_sold     bigint       null,
+    product_view   int          null,
+    brand_id       bigint       null,
+    constraint FKs6cydsualtsrprvlf2bb3lcam
+        foreign key (brand_id) references brand (id)
+);
+
+create table product_category
+(
+    product_id  varchar(255) not null,
+    category_id bigint       not null,
+    constraint FK2k3smhbruedlcrvu6clued06x
+        foreign key (product_id) references product (id),
+    constraint FKkud35ls1d40wpjb5htpp14q4e
+        foreign key (category_id) references category (id)
+);
+
+create table product_size
+(
+    product_id varchar(255) not null,
+    size       int          not null,
+    quantity   int          null,
+    primary key (product_id, size)
+);
+
+create table users
+(
+    id          bigint auto_increment
+        primary key,
+    address     varchar(255) null,
+    avatar      varchar(255) null,
+    created_at  datetime(6)  null,
+    email       varchar(200) not null,
+    full_name   varchar(255) null,
+    modified_at datetime(6)  null,
+    password    varchar(255) not null,
+    phone       varchar(255) null,
+    roles       json         not null,
+    status      tinyint(1)   null
+);
+
+create table images
+(
+    id         varchar(255) not null
+        primary key,
+    created_at datetime(6)  null,
+    link       varchar(255) null,
+    name       varchar(255) null,
+    size       bigint       null,
+    type       varchar(255) null,
+    created_by bigint       null,
+    constraint UK_4mgw71qgyeud96uf8kgiu9fsw
+        unique (link),
+    constraint FKp1m9f9rm7xy8nk7a820dvh6c4
+        foreign key (created_by) references users (id)
+);
+
+create table orders
+(
+    id               bigint auto_increment
+        primary key,
+    created_at       datetime(6)  null,
+    modified_at      datetime(6)  null,
+    note             varchar(255) null,
+    price            bigint       null,
+    promotion        json         null,
+    quantity         int          null,
+    receiver_address varchar(255) null,
+    receiver_name    varchar(255) null,
+    receiver_phone   varchar(255) null,
+    size             int          null,
+    status           int          null,
+    total_price      bigint       null,
+    buyer            bigint       null,
+    created_by       bigint       null,
+    modified_by      bigint       null,
+    product_id       varchar(255) null,
+    coupon           json         null,
+    constraint FK787ibr3guwp6xobrpbofnv7le
+        foreign key (product_id) references product (id),
+    constraint FKe0abpy849bl2ynw3468ksavvl
+        foreign key (modified_by) references users (id),
+    constraint FKljvc97l19m7cnlopv8535hijx
+        foreign key (buyer) references users (id),
+    constraint FKtjwuphstqm46uffgc7l1r27a9
+        foreign key (created_by) references users (id)
+);
+
+create table metrics
+(
+    id         bigint auto_increment
+        primary key,
+    created_at datetime(6) null,
+    profit     bigint      null,
+    quantity   int         null,
+    sales      bigint      null,
+    order_id   bigint      null,
+    constraint FKok7jp7mh6y9tghumc2do51ieq
+        foreign key (order_id) references orders (id)
+);
+
+create table post
+(
+    id           bigint auto_increment
+        primary key,
+    content      text          null,
+    created_at   datetime(6)   null,
+    description  text          null,
+    modified_at  datetime(6)   null,
+    published_at datetime(6)   null,
+    slug         varchar(600)  not null,
+    status       int default 0 null,
+    thumbnail    varchar(255)  null,
+    title        varchar(300)  not null,
+    created_by   bigint        null,
+    modified_by  bigint        null,
+    constraint FK3b6cq7u0x3fdxeh4sq95mia29
+        foreign key (created_by) references users (id),
+    constraint FKl2q2idcap1gt3qhh87ebirpnc
+        foreign key (modified_by) references users (id)
+);
+
+create table comment
+(
+    id         bigint auto_increment
+        primary key,
+    content    text         null,
+    created_at datetime(6)  null,
+    product_id varchar(255) null,
+    user_id    bigint       null,
+    post_id    bigint       null,
+    constraint FKm1rmnfcvq5mk26li4lit88pc5
+        foreign key (product_id) references product (id),
+    constraint FKqm52p1v3o13hy268he0wcngr5
+        foreign key (user_id) references users (id),
+    constraint FKs1slvnkuemjsq2kj4h3vhx7i1
+        foreign key (post_id) references post (id)
+);
+
+
