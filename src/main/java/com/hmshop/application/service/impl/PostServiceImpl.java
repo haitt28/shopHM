@@ -12,6 +12,7 @@ import com.hmshop.application.entity.User;
 import com.hmshop.application.model.request.CreatePostRequest;
 import com.hmshop.application.service.PostService;
 import com.hmshop.application.utils.PageUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,9 +27,10 @@ import java.util.Optional;
 import static com.hmshop.application.Constant.Constant.*;
 
 @Component
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
-    @Autowired
-    private PostRepository postRepository;
+
+    private final PostRepository postRepository;
 
     @Override
     public PageableDTO adminGetListPost(String title, String status, int page) {

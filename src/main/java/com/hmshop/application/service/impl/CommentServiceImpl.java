@@ -8,16 +8,17 @@ import com.hmshop.application.model.request.CreateCommentPostRequest;
 import com.hmshop.application.model.request.CreateCommentProductRequest;
 import com.hmshop.application.repository.CommentRepository;
 import com.hmshop.application.service.CommentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 
 @Component
+@RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
-    private CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public Comment createCommentPost(CreateCommentPostRequest createCommentPostRequest, long userId) {

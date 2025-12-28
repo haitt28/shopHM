@@ -6,6 +6,7 @@ import com.hmshop.application.model.request.CreatePostRequest;
 import com.hmshop.application.config.security.CustomUserDetails;
 import com.hmshop.application.service.ImageService;
 import com.hmshop.application.service.PostService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +19,11 @@ import javax.validation.Valid;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class PostController {
 
-    @Autowired
-    private PostService postService;
-
-    @Autowired
-    private ImageService imageService;
+    private final PostService postService;
+    private final ImageService imageService;
 
     @GetMapping("/admin/posts")
     public String getPostManagePage(Model model,

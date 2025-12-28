@@ -6,6 +6,7 @@ import com.hmshop.application.exception.InternalServerException;
 import com.hmshop.application.exception.NotFoundException;
 import com.hmshop.application.config.security.CustomUserDetails;
 import com.hmshop.application.service.ImageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -22,11 +23,11 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 @RestController
+@RequiredArgsConstructor
 public class ImageController {
-    private static String UPLOAD_DIR = System.getProperty("user.home") + "/media/upload";
 
-    @Autowired
-    private ImageService imageService;
+    private static String UPLOAD_DIR = System.getProperty("user.home") + "/media/upload";
+    private final ImageService imageService;
 
     @PostMapping("/api/upload/files")
     public ResponseEntity<Object> uploadFile(@RequestParam("file") MultipartFile file) {

@@ -2,6 +2,7 @@ package com.hmshop.application.controller.shop;
 
 import com.hmshop.application.entity.Post;
 import com.hmshop.application.service.PostService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -13,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class BlogController {
 
-    @Autowired
-    private PostService postService;
+    private final PostService postService;
 
     @GetMapping("/tin-tuc")
     public String getPostPages(Model model,

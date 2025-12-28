@@ -4,6 +4,7 @@ import com.hmshop.application.entity.Coupon;
 import com.hmshop.application.entity.Coupon;
 import com.hmshop.application.model.request.CreateCouponRequest;
 import com.hmshop.application.service.CouponService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Controller
+@RequiredArgsConstructor
 public class CouponController {
 
-    @Autowired
-    private CouponService couponService;
+    private final CouponService couponService;
 
     @GetMapping("/admin/coupons")
     public String getListCouponPages(Model model,

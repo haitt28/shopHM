@@ -5,6 +5,7 @@ import com.hmshop.application.model.dto.MetricsDTO;
 import com.hmshop.application.model.request.FilterDayByDay;
 import com.hmshop.application.repository.*;
 import com.hmshop.application.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,34 +20,18 @@ import java.util.Date;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class DashboardController {
 
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private BrandService brandService;
-
-    @Autowired
-    private MetricsRepository metricsRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
-    private BrandRepository brandRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final ProductService productService;
+    private final OrderService orderService;
+    private final CategoryService categoryService;
+    private final BrandService brandService;
+    private final MetricsRepository metricsRepository;
+    private final CategoryRepository categoryRepository;
+    private final BrandRepository brandRepository;
+    private final ProductRepository productRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/admin")
     public String dashboard(Model model){

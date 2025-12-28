@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,6 +20,7 @@ public class ProductDTO {
     private long salePrice;
     private long totalSold;
     private int status;
-    private ArrayList<String> images;
-    private ArrayList<String> feedBackImages;
+    private List<String> images;
+    private List<String> feedBackImages;
+    private List<String> color;
 }

@@ -11,6 +11,7 @@ import com.hmshop.application.model.request.UpdateProfileRequest;
 import com.hmshop.application.config.security.CustomUserDetails;
 import com.hmshop.application.config.security.JwtTokenUtil;
 import com.hmshop.application.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,16 +34,12 @@ import java.util.List;
 import static com.hmshop.application.Constant.Constant.MAX_AGE_COOKIE;
 
 @Controller
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AuthenticationManager authenticationManager;
 
     @GetMapping("/users")
     public ResponseEntity<Object> getListUsers() {

@@ -4,6 +4,7 @@ import com.hmshop.application.model.mapper.CategoryMapper;
 import com.hmshop.application.entity.Category;
 import com.hmshop.application.model.request.CreateCategoryRequest;
 import com.hmshop.application.service.CategoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Controller
+@RequiredArgsConstructor
 public class CategoryController {
-    @Autowired
-    private CategoryService categoryService;
+
+    private final CategoryService categoryService;
 
     @GetMapping("/admin/categories")
     public String homePage(Model model,

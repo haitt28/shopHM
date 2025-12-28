@@ -14,6 +14,7 @@ import com.hmshop.application.model.request.UpdateStatusOrderRequest;
 import com.hmshop.application.service.CouponService;
 import com.hmshop.application.service.OrderService;
 import com.hmshop.application.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,16 +29,12 @@ import java.util.List;
 import static com.hmshop.application.Constant.Constant.*;
 
 @Controller
+@RequiredArgsConstructor
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private CouponService couponService;
+    private final OrderService orderService;
+    private final ProductService productService;
+    private final CouponService couponService;
 
     @GetMapping("/admin/orders")
     public String getListOrderPage(Model model,

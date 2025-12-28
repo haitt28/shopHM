@@ -7,6 +7,7 @@ import com.hmshop.application.model.request.CreateBrandRequest;
 import com.hmshop.application.config.security.CustomUserDetails;
 import com.hmshop.application.service.BrandService;
 import com.hmshop.application.service.ImageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,11 @@ import javax.validation.Valid;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class BrandController {
 
-    @Autowired
-    private BrandService brandService;
-
-    @Autowired
-    private ImageService imageService;
+    private final BrandService brandService;
+    private final ImageService imageService;
 
     @GetMapping("/admin/brands")
     public String homePage(Model model,

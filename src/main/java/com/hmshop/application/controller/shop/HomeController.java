@@ -11,6 +11,7 @@ import com.hmshop.application.model.request.CreateOrderRequest;
 import com.hmshop.application.model.request.FilterProductRequest;
 import com.hmshop.application.config.security.CustomUserDetails;
 import com.hmshop.application.service.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,25 +27,14 @@ import java.util.List;
 import static com.hmshop.application.Constant.Constant.*;
 
 @Controller
+@RequiredArgsConstructor
 public class HomeController {
 
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private BrandService brandService;
-
-//    @Autowired
-//    private PostService postService;
-
-    @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private CouponService couponService;
+    private final ProductService productService;
+    private final BrandService brandService;
+    private final OrderService orderService;
+    private final CategoryService categoryService;
+    private final CouponService couponService;
 
     @GetMapping
     public String homePage(Model model){

@@ -5,6 +5,7 @@ import com.hmshop.application.exception.InternalServerException;
 import com.hmshop.application.repository.ImageRepository;
 import com.hmshop.application.entity.Image;
 import com.hmshop.application.service.ImageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +14,10 @@ import java.io.File;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
 
-    @Autowired
-    private ImageRepository imageRepository;
+    private final ImageRepository imageRepository;
 
     @Override
     public void saveImage(Image image) {

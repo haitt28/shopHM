@@ -9,6 +9,7 @@ import com.hmshop.application.model.request.ChangePasswordRequest;
 import com.hmshop.application.model.request.CreateUserRequest;
 import com.hmshop.application.model.request.UpdateProfileRequest;
 import com.hmshop.application.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,10 +24,10 @@ import java.util.List;
 import static com.hmshop.application.Constant.Constant.LIMIT_USER;
 
 @Component
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<UserDTO> getListUsers() {

@@ -8,6 +8,7 @@ import com.hmshop.application.model.dto.ProductDTO;
 import com.hmshop.application.model.request.CreateProductRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProductMapper {
     public static ProductDTO toProductDTO(Product product) {
@@ -21,6 +22,7 @@ public class ProductMapper {
         productDTO.setFeedBackImages(product.getImageFeedBack());
         productDTO.setTotalSold(product.getTotalSold());
         productDTO.setStatus(product.getStatus());
+        productDTO.setColor(product.getColor());
 
         return productDTO;
     }
@@ -42,7 +44,7 @@ public class ProductMapper {
         brand.setId(createProductRequest.getBrandId());
         product.setBrand(brand);
         //Category
-        ArrayList<Category> categories = new ArrayList<>();
+        List<Category> categories = new ArrayList<>();
         for (Integer id : createProductRequest.getCategoryIds()) {
             Category category = new Category();
             category.setId(id);
@@ -50,6 +52,8 @@ public class ProductMapper {
         }
         product.setCategories(categories);
 
+        //color
+        product.setColor(createProductRequest.getColor());
         return product;
     }
 }

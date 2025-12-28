@@ -27,9 +27,9 @@ public class DetailProductInfoDTO {
 
     private long totalSold;
 
-    private ArrayList<String> productImages;
+    private List<String> productImages;
 
-    private ArrayList<String> feedbackImages;
+    private List<String> feedbackImages;
 
     private long CouponPrice;
 

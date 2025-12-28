@@ -15,6 +15,7 @@ import com.hmshop.application.repository.ProductSizeRepository;
 import com.hmshop.application.repository.MetricsRepository;
 import com.hmshop.application.service.OrderService;
 import com.hmshop.application.service.CouponService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,22 +30,14 @@ import java.util.Optional;
 import static com.hmshop.application.Constant.Constant.*;
 
 @Controller
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private ProductSizeRepository productSizeRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private CouponService couponService;
-
-    @Autowired
-    private MetricsRepository metricsRepository;
+    private final ProductRepository productRepository;
+    private final ProductSizeRepository productSizeRepository;
+    private final OrderRepository orderRepository;
+    private final CouponService couponService;
+    private final MetricsRepository metricsRepository;
 
     @Override
     public Page<Order> adminGetListOrders(String id, String name, String phone, String status, String product, int page) {

@@ -8,6 +8,7 @@ import com.hmshop.application.repository.CouponRepository;
 import com.hmshop.application.entity.Coupon;
 import com.hmshop.application.model.request.CreateCouponRequest;
 import com.hmshop.application.service.CouponService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,10 +23,10 @@ import java.util.Optional;
 import static com.hmshop.application.Constant.Constant.DISCOUNT_PERCENT;
 
 @Component
+@RequiredArgsConstructor
 public class CouponServiceImpl implements CouponService {
 
-    @Autowired
-    private CouponRepository couponRepository;
+    private final CouponRepository couponRepository;
 
     @Override
     public Page<Coupon> adminGetListCoupon(String code, String name, String publish, String active, int page) {

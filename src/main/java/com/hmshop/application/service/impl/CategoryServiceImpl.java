@@ -8,6 +8,7 @@ import com.hmshop.application.repository.CategoryRepository;
 import com.hmshop.application.entity.Category;
 import com.hmshop.application.model.request.CreateCategoryRequest;
 import com.hmshop.application.service.CategoryService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,9 +22,10 @@ import java.util.*;
 import static com.hmshop.application.Constant.Constant.LIMIT_CATEGORY;
 
 @Component
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    @Autowired
-    private CategoryRepository categoryRepository;
+
+    private final CategoryRepository categoryRepository;
 
     @Override
     public Page<Category> adminGetListCategory(String id, String name, String status, int page) {

@@ -9,6 +9,7 @@ import com.hmshop.application.service.BrandService;
 import com.hmshop.application.service.CategoryService;
 import com.hmshop.application.service.ImageService;
 import com.hmshop.application.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
@@ -33,6 +34,7 @@ import static com.hmshop.application.Constant.Constant.SIZE_VN;
 
 @Slf4j
 @Controller
+@RequiredArgsConstructor
 public class ProductController {
 
     private String xlsx = ".xlsx";
@@ -40,20 +42,11 @@ public class ProductController {
     private static final String TEMP_EXPORT_DATA_DIRECTORY = "\\resources\\reports";
     private static final String EXPORT_DATA_REPORT_FILE_NAME = "San_pham";
 
-    @Autowired
-    private ServletContext context;
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private BrandService brandService;
-
-    @Autowired
-    private CategoryService categoryService;
-
-    @Autowired
-    private ImageService imageService;
+    private final ServletContext context;
+    private final ProductService productService;
+    private final BrandService brandService;
+    private final CategoryService categoryService;
+    private final ImageService imageService;
 
     @GetMapping("/admin/products")
     public String homePages(Model model,

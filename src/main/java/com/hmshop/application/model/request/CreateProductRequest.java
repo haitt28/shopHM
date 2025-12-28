@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.*;
 import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -43,9 +44,13 @@ public class CreateProductRequest {
 
     @NotNull(message = "Danh sách ảnh trống!")
     @JsonProperty("product_images")
-    private ArrayList<String> images;
+    private List<String> images;
 
     @JsonProperty("feed_back_images")
-    private ArrayList<String> feedBackImages;
+    private List<String> feedBackImages;
     private int status;
+
+    @NotNull(message = "Vui lòng chọn màu sản phẩm")
+    @JsonProperty("color")
+    private List<String> color;
 }

@@ -8,6 +8,7 @@ import com.hmshop.application.repository.BrandRepository;
 import com.hmshop.application.service.BrandService;
 import com.hmshop.application.entity.Brand;
 import com.hmshop.application.model.request.CreateBrandRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,10 +23,10 @@ import java.util.Optional;
 import static com.hmshop.application.Constant.Constant.LIMIT_BRAND;
 
 @Component
+@RequiredArgsConstructor
 public class BrandServiceImpl implements BrandService {
 
-    @Autowired
-    private BrandRepository brandRepository;
+    private final BrandRepository brandRepository;
 
     @Override
     public Page<Brand> adminGetListBrands(String id, String name, String status, Integer page) {

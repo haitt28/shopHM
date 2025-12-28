@@ -188,10 +188,10 @@ public class Product {
     private String slug;
     @Type(type = "json")
     @Column(name = "images",columnDefinition = "json")
-    private ArrayList<String> images;
+    private List<String> images;
     @Type(type = "json")
     @Column(name = "image_feedback",columnDefinition = "json")
-    private ArrayList<String> imageFeedBack;
+    private List<String> imageFeedBack;
     @Column(name = "product_view")
     private int view;
     @Column(name = "total_sold")
@@ -215,12 +215,10 @@ public class Product {
     )
     private List<Category> categories;
 
-//    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL)
-//    private List<CartProduct> cartProducts = new ArrayList<>();
-
     @OneToMany(mappedBy = "product")
     private List<Comment> comments;
+    @Type(type = "json")
+    @Column(name = "color",columnDefinition = "json")
+    private List<String> color;
 
-//    @OneToMany(mappedBy = "product")
-//    private List<Rate> rates;
 }

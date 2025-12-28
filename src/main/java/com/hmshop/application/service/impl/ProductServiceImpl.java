@@ -22,6 +22,7 @@ import com.hmshop.application.model.request.UpdateFeedBackRequest;
 import com.hmshop.application.service.ProductService;
 import com.hmshop.application.service.CouponService;
 import com.hmshop.application.utils.PageUtil;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,22 +39,14 @@ import java.util.Optional;
 import static com.hmshop.application.Constant.Constant.*;
 
 @Component
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private ProductSizeRepository productSizeRepository;
-
-    @Autowired
-    private CouponService couponService;
-
-    @Autowired
-    private CouponRepository couponRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final ProductSizeRepository productSizeRepository;
+    private final CouponService couponService;
+    private final CouponRepository couponRepository;
+    private final OrderRepository orderRepository;
 
     @Override
     public Page<Product> adminGetListProduct(String id, String name, String category, String brand, Integer page) {

@@ -6,6 +6,7 @@ import com.hmshop.application.model.request.CreateCommentPostRequest;
 import com.hmshop.application.model.request.CreateCommentProductRequest;
 import com.hmshop.application.config.security.CustomUserDetails;
 import com.hmshop.application.service.CommentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.validation.Valid;
 
 @Controller
+@RequiredArgsConstructor
 public class CommentController {
 
-    @Autowired
-    private CommentService commentService;
+    private final CommentService commentService;
 
     @PostMapping("/api/comments/post")
     public ResponseEntity<Object> createComment(@Valid @RequestBody CreateCommentPostRequest createCommentPostRequest) {
