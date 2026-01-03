@@ -94,7 +94,7 @@ public class HomeController {
         }
 
         //Lấy danh sách size giầy
-        model.addAttribute("sizeVn", SIZE_VN);
+        model.addAttribute("sizeVn", PRODUCT_SIZE);
         model.addAttribute("sizeUs", SIZE_US);
         model.addAttribute("sizeCm", SIZE_CM);
 
@@ -133,7 +133,7 @@ public class HomeController {
         model.addAttribute("notFoundSize", notFoundSize);
 
         //Lấy danh sách size
-        model.addAttribute("sizeVn", SIZE_VN);
+        model.addAttribute("sizeVn", PRODUCT_SIZE);
         model.addAttribute("sizeUs", SIZE_US);
         model.addAttribute("sizeCm", SIZE_CM);
         model.addAttribute("size", size);
@@ -177,7 +177,7 @@ public class HomeController {
         model.addAttribute("categoryIds", categoryIds);
 
         //Danh sách size của sản phẩm
-        model.addAttribute("sizeVn", SIZE_VN);
+        model.addAttribute("sizeVn", PRODUCT_SIZE);
 
         //Lấy danh sách sản phẩm
         FilterProductRequest req = new FilterProductRequest(brandIds, categoryIds, new ArrayList<>(), (long) 0, Long.MAX_VALUE, 1);

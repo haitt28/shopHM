@@ -1,5 +1,7 @@
 package com.hmshop.application.Constant;
 
+import com.hmshop.application.model.ProductOption;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +30,26 @@ public class Constant {
 
     //Post
     public static final int LIMIT_POST_NEW = 5;
+    //Size giày
+    public static final List<ProductOption> PRODUCT_SIZE = Arrays.asList(
+            new ProductOption(1, "XS"),
+            new ProductOption(2, "S"),
+            new ProductOption(3, "M"),
+            new ProductOption(4, "L"),
+            new ProductOption(5, "XL")
+    );
+    // Mảng color
+    public static final List<ProductOption> PRODUCT_COLOR = Arrays.asList(
+            new ProductOption(1, "Trắng"),
+            new ProductOption(2, "Đen"),
+            new ProductOption(3, "Đỏ"),
+            new ProductOption(4, "Xanh"),
+            new ProductOption(5, "Vàng"),
+            new ProductOption(6, "Hồng"),
+            new ProductOption(7, "Cam"),
+            new ProductOption(8, "Tím"),
+            new ProductOption(9, "Nâu")
+    );
 
     //Size giày
     public static final List<Integer> SIZE_VN = new ArrayList<>(Arrays.asList(35, 36, 37, 38, 39, 40, 41, 42));

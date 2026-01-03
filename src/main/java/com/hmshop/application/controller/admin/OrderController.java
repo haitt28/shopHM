@@ -67,7 +67,7 @@ public class OrderController {
         model.addAttribute("products", products);
 
         // Get list size
-        model.addAttribute("sizeVn", SIZE_VN);
+        model.addAttribute("sizeVn", PRODUCT_SIZE);
 
 //        //Get list valid Coupon
         List<Coupon> coupons = couponService.getAllValidCoupon();

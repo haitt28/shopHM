@@ -253,7 +253,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderInfoDTO> list = orderRepository.getListOrderOfPersonByStatus(status, userId);
 
         for (OrderInfoDTO dto : list) {
-            for (int i = 0; i < SIZE_VN.size(); i++) {
+            for (int i = 0; i < PRODUCT_SIZE.size(); i++) {
                 if (SIZE_VN.get(i) == dto.getSizeVn()) {
                     dto.setSizeUs(SIZE_US[i]);
                     dto.setSizeCm(SIZE_CM[i]);

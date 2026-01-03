@@ -217,6 +217,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product")
     private List<Comment> comments;
+
     @Type(type = "json")
     @Column(name = "color",columnDefinition = "json")
     private List<String> color;

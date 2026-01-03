@@ -3,6 +3,7 @@ package com.hmshop.application.service.impl;
 import com.hmshop.application.exception.BadRequestException;
 import com.hmshop.application.exception.InternalServerException;
 import com.hmshop.application.exception.NotFoundException;
+import com.hmshop.application.model.ProductOption;
 import com.hmshop.application.model.dto.DetailProductInfoDTO;
 import com.hmshop.application.model.dto.PageableDTO;
 import com.hmshop.application.model.dto.ProductInfoDTO;
@@ -244,8 +245,8 @@ public class ProductServiceImpl implements ProductService {
 
         //Kiểm trả size
         boolean isValid = false;
-        for (int size : SIZE_VN) {
-            if (size == createSizeCountRequest.getSize()) {
+        for (ProductOption size : PRODUCT_SIZE) {
+            if (size.getId() == createSizeCountRequest.getSize()) {
                 isValid = true;
                 break;
             }

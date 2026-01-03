@@ -203,13 +203,24 @@
                             <div class="row">
                                 <form class="form-inline">
                                     <div class="form-group col-md-2">
-                                        <label for="size">Size giày</label>&emsp;
+                                        <label for="size">Size</label>&emsp;
                                         <select class="form-control" id="size">
-                                            <th:block th:each="size : ${sizeVN}">
-                                                <option th:value="${size}" th:text="${size}"></option>
+                                            <th:block th:each="size : ${sizes}">
+                                                <option th:value="${size.getId()}" th:text="${size.getValue()}"></option>
                                             </th:block>
                                         </select>
                                     </div>
+                                    <form class="form-inline">
+                                        <div class="form-group col-md-2">
+                                            <label for="size">Màu</label>&emsp;
+                                            <select multiple data-plugin-selectTwo class="form-control populate"
+                                                    name="colors[]" id="color">
+                                                <th:block th:each="color : ${colors}">
+                                                    <option th:value="${color.getId()}"
+                                                            th:text="${color.getValue()}"></option>
+                                                </th:block>
+                                            </select>
+                                        </div>
                                     <div class="form-group col-md-2">
                                         <label for="count">Số lượng có sẵn</label>&emsp;
                                         <input type="number" class="form-control" id="count" min="0" value="0">
@@ -482,6 +493,7 @@
         $('.btn-update-size-count').click(function (event) {
             event.preventDefault();
             let size = parseInt($('#size').val());
+            let colors = parseInt($('#colors').val());
             let count = parseInt($('#count').val());
             if (isNaN(count)) {
                 $('#invalid-feedback-size').show();

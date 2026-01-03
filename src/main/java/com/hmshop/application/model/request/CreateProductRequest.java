@@ -50,7 +50,6 @@ public class CreateProductRequest {
     private List<String> feedBackImages;
     private int status;
 
-    @NotNull(message = "Vui lòng chọn màu sản phẩm")
     @JsonProperty("color")
     private List<String> color;
 }

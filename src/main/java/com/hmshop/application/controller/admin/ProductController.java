@@ -28,9 +28,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
-import static com.hmshop.application.Constant.Constant.SIZE_VN;
+import static com.hmshop.application.Constant.Constant.PRODUCT_COLOR;
+import static com.hmshop.application.Constant.Constant.PRODUCT_SIZE;
 
 @Slf4j
 @Controller
@@ -62,6 +64,13 @@ public class ProductController {
         //Lấy danh sách danh mục
         List<Category> categories = categoryService.getListCategories();
         model.addAttribute("categories", categories);
+        List<String> colors = List.of(
+                "Black", "White", "Gray",
+                "Red", "Blue", "Green", "Yellow",
+                "Beige", "Cream", "Brown", "Navy", "Khaki",
+                "Pink", "Purple", "Orange"
+        );
+        model.addAttribute("colors",colors);
         //Lấy danh sách sản phẩm
         Page<Product> products = productService.adminGetListProduct(id, name, category, brand, page);
         model.addAttribute("products", products.getContent());
@@ -109,7 +118,10 @@ public class ProductController {
         model.addAttribute("brands", brands);
 
         //Lấy danh sách size
-        model.addAttribute("sizeVN", SIZE_VN);
+        model.addAttribute("sizes", PRODUCT_SIZE);
+
+        //Lấy danh sách size
+        model.addAttribute("colors", PRODUCT_COLOR);
 
         //Lấy size của sản phẩm
         List<ProductSize> productSizes = productService.getListSizeOfProduct(id);
