@@ -8,26 +8,24 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class OrderInfoDTO {
     private long id;
 
     private long totalPrice;
 
-    private int sizeVn;
+    private Integer size;
 
-    private double sizeUs;
-
-    private double sizeCm;
+    private Integer color;
 
     private String productName;
 
     private String productImg;
 
-    public OrderInfoDTO(long id, long totalPrice, int sizeVn, String productName, String productImg) {
+    public OrderInfoDTO(long id, long totalPrice, Integer size,Integer color, String productName, String productImg) {
         this.id = id;
         this.totalPrice = totalPrice;
-        this.sizeVn = sizeVn;
+        this.size = size;
+        this.color = color;
         this.productName = productName;
         this.productImg = productImg;
     }

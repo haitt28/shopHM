@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.hmshop.application.Constant.Constant.*;
 
@@ -85,8 +86,31 @@ public class HomeController {
         model.addAttribute("brands",brands);
 
         // Lấy size có sẵn
-        List<Integer> availableSizes = productService.getListAvailableSize(id);
+        List<ProductVariant> productVariants = productService.getListSizeOfProduct(id);
+
+        // ===== SAFE NULL / EMPTY =====
+        if (productVariants == null || productVariants.isEmpty()) {
+            model.addAttribute("availableSizes", List.of());
+            model.addAttribute("availableColors", List.of());
+            model.addAttribute("notFoundSize", true);
+        }
+
+        // ===== BUILD SIZE & COLOR LIST =====
+        List<Integer> availableSizes = productVariants.stream()
+                .map(ProductVariant::getSize)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+
+        List<Integer> availableColors = productVariants.stream()
+                .map(ProductVariant::getColor)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
         model.addAttribute("availableSizes", availableSizes);
+        model.addAttribute("availableColors", availableColors);
         if (!availableSizes.isEmpty()) {
             model.addAttribute("canBuy", true);
         } else {
@@ -94,15 +118,13 @@ public class HomeController {
         }
 
         //Lấy danh sách size giầy
-        model.addAttribute("sizeVn", PRODUCT_SIZE);
-        model.addAttribute("sizeUs", SIZE_US);
-        model.addAttribute("sizeCm", SIZE_CM);
-
+        model.addAttribute("sizes", PRODUCT_SIZE);
+        model.addAttribute("colors", PRODUCT_COLOR);
         return "shop/detail";
     }
 
     @GetMapping("/dat-hang")
-    public String getCartPage(Model model, @RequestParam String id,@RequestParam int size){
+    public String getCartPage(Model model, @RequestParam String id,@RequestParam Integer size,@RequestParam Integer color){
 
         //Lấy chi tiết sản phẩm
         DetailProductInfoDTO product;
@@ -114,29 +136,50 @@ public class HomeController {
             return "error/500";
         }
         model.addAttribute("product", product);
-
-        //Validate size
-        if (size < 35 || size > 42) {
-            return "error/404";
-        }
-
-        //Lấy danh sách size có sẵn
-        List<Integer> availableSizes = productService.getListAvailableSize(id);
-        model.addAttribute("availableSizes", availableSizes);
         boolean notFoundSize = true;
-        for (Integer availableSize : availableSizes) {
-            if (availableSize == size) {
-                notFoundSize = false;
-                break;
-            }
+
+        List<ProductVariant> productVariants = productService.getListSizeOfProduct(id);
+
+        // ===== SAFE NULL / EMPTY =====
+        if (productVariants == null || productVariants.isEmpty()) {
+            model.addAttribute("availableSizes", List.of());
+            model.addAttribute("availableColors", List.of());
+            model.addAttribute("notFoundSize", true);
         }
+
+        // ===== BUILD SIZE & COLOR LIST =====
+        List<Integer> availableSizes = productVariants.stream()
+                .map(ProductVariant::getSize)
+                .filter(Objects::nonNull)
+                .distinct()
+                .sorted()
+                .toList();
+
+        List<Integer> availableColors = productVariants.stream()
+                .map(ProductVariant::getColor)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+
+        model.addAttribute("availableSizes", availableSizes);
+        model.addAttribute("availableColors", availableColors);
+
+        // ===== CHECK NULL INPUT =====
+        if (size != null && color != null) {
+            notFoundSize = productVariants.stream()
+                    .noneMatch(v ->
+                            size.equals(v.getSize()) &&
+                                    color.equals(v.getColor())
+                    );
+        }
+
         model.addAttribute("notFoundSize", notFoundSize);
 
         //Lấy danh sách size
-        model.addAttribute("sizeVn", PRODUCT_SIZE);
-        model.addAttribute("sizeUs", SIZE_US);
-        model.addAttribute("sizeCm", SIZE_CM);
+        model.addAttribute("sizes", PRODUCT_SIZE);
+        model.addAttribute("colors", PRODUCT_COLOR);
         model.addAttribute("size", size);
+        model.addAttribute("color", color);
 
         return "shop/payment";
     }
@@ -177,7 +220,7 @@ public class HomeController {
         model.addAttribute("categoryIds", categoryIds);
 
         //Danh sách size của sản phẩm
-        model.addAttribute("sizeVn", PRODUCT_SIZE);
+        model.addAttribute("sizes", PRODUCT_SIZE);
 
         //Lấy danh sách sản phẩm
         FilterProductRequest req = new FilterProductRequest(brandIds, categoryIds, new ArrayList<>(), (long) 0, Long.MAX_VALUE, 1);

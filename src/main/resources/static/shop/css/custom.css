@@ -814,10 +814,10 @@ input[type=radio] + label .radio-dot:before {
     border: none;
     background-color: #333333;
     color: #ffffff;
-    padding: 1rem 1.9375rem;
-    line-height: 2.1875rem;
-    text-transform: uppercase;
-    margin-bottom: 12px;
+    /*padding:  1.85rem 4.2rem;*/
+    /*line-height: 2.1875rem;*/
+    /*text-transform: uppercase;*/
+    /*margin-bottom: 12px;*/
     border-radius: 5px;
 }
 
@@ -941,4 +941,52 @@ input[type=radio] + label .radio-dot:before {
     height: 100%;
     object-fit: cover; /* quan trọng */
     display: block;
+}
+.price-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* khoảng cách giữa các item */
+}
+
+.price-vertical input,
+.price-vertical button {
+    width: 100%;
+}
+
+.desc-sub-title {
+    margin-right: 2rem;
+}
+#modal-size-Choose .color {
+    margin-top: 1rem;
+}
+#modal-size-Choose .color .select-filter,
+#sizeGuideModal .color .select-filter {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 1.25rem;
+}
+
+#modal-size-Choose .color .select-filter .item,
+#sizeGuideModal .color .select-filter .item {
+    width: 100%;
+    min-height: 70px;
+    margin: 0px;
+    text-align: center;
+    border: 1px solid #333333;
+    border-radius: 0.125rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+#modal-size-Choose .color .select-filter .item:after,
+#sizeGuideModal .color .select-filter .item:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+.color-choose {
+    background-color: #08C;
+    color: #ffffff;
+    border: none !important;
 }

@@ -142,6 +142,7 @@
                                                     <tr>
                                                         <th>Sản phẩm</th>
                                                         <th>Kích cỡ</th>
+                                                        <th>Màu</th>
                                                         <th>Giá tiền</th>
                                                         <th>Khuyến mãi</th>
                                                         <th>Mức giảm</th>
@@ -154,9 +155,15 @@
                                                             <a target="_blank" th:href="@{/admin/products/{slug}/{id}(id=${order.product.id}, slug=${order.product.slug})}" th:text="${order.product.name}"></a>
                                                         </td>
                                                         <td>
-                                                            <span th:text="${order.size}"></span>
-                                                            <th:block th:if="${order.status} == 1">
-                                                                <span th:if="${sizeIsAvailable} == false" class="badge badge-danger">Hết hàng</span>
+                                                            <span th:text="${order.size != null} ? ${sizeMap[order.size]} : 'Chưa chọn'"></span>
+                                                            <th:block th:if="${order.status == 1}">
+                                                                <span th:if="${sizeIsAvailable == false}" class="badge badge-danger">Hết hàng</span>
+                                                            </th:block>
+                                                        </td>
+                                                        <td>
+                                                            <span th:text="${order.color != null} ? ${colorMap[order.color]} : 'Chưa chọn'"></span>
+                                                            <th:block th:if="${order.status == 1}">
+                                                                <span th:if="${sizeIsAvailable == false}" class="badge badge-danger">Hết hàng</span>
                                                             </th:block>
                                                         </td>
                                                         <td>

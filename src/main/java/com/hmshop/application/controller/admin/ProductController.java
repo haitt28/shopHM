@@ -31,8 +31,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.hmshop.application.Constant.Constant.PRODUCT_COLOR;
-import static com.hmshop.application.Constant.Constant.PRODUCT_SIZE;
+import static com.hmshop.application.Constant.Constant.*;
 
 @Slf4j
 @Controller
@@ -117,15 +116,15 @@ public class ProductController {
         List<Brand> brands = brandService.getListBrand();
         model.addAttribute("brands", brands);
 
-        //Lấy danh sách size
+        //Lấy danh sách options
         model.addAttribute("sizes", PRODUCT_SIZE);
-
-        //Lấy danh sách size
         model.addAttribute("colors", PRODUCT_COLOR);
+        model.addAttribute("sizeMap", PRODUCT_SIZE_MAP);
+        model.addAttribute("colorMap", PRODUCT_COLOR_MAP);
 
         //Lấy size của sản phẩm
-        List<ProductSize> productSizes = productService.getListSizeOfProduct(id);
-        model.addAttribute("productSizes", productSizes);
+        List<ProductVariant> productVariants = productService.getListSizeOfProduct(id);
+        model.addAttribute("productVariants", productVariants);
 
         return "admin/product/edit";
     }
@@ -171,9 +170,8 @@ public class ProductController {
     }
 
     @PutMapping("/api/admin/products/sizes")
-    public ResponseEntity<?> updateSizeCount(@Valid @RequestBody CreateSizeCountRequest createSizeCountRequest) {
+    public ResponseEntity<?> updateSizeCount(Model model,@Valid @RequestBody CreateSizeCountRequest createSizeCountRequest) {
         productService.createSizeCount(createSizeCountRequest);
-
         return ResponseEntity.ok("Cập nhật thành công!");
     }
 

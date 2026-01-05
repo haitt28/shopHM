@@ -56,7 +56,11 @@
                         <div class="pricing childs">
                             <h6 class="not-found-size" style="margin-top: 5px; color: #dc3545;"  th:styleappend="${notFoundSize} == true ? '' : 'display:none'">Size giày này đã hết. Vui lòng chọn size khác.</h6>
                             <div class="size-btn" data-toggle="modal" data-target="#modal-size-Choose">
-                                <button class="btn btn-primary size trans-btn"><span class="size-text">Size</span><span th:data-size="${size}" class="size-details">9US | 42.5VN | 26.2CM</span><i class="fas dropdown-arrow"></i></button>
+                                <button class="btn btn-primary size trans-btn">
+                                    <span class="size-text">Size</span>
+                                    <span th:data-size="${size}" class="size-details"></span>
+                                    <i class="fas dropdown-arrow"></i>
+                                </button>
                             </div>
                             <div class="input-group" style="margin-top:30px">
                                 <input type="text" class="form-control" placeholder="Nhập mã khuyến mãi" id="in-coupon" th:value="${product.couponCode}">
@@ -141,64 +145,92 @@
 
         let couponCode = [[${product.couponCode}]];
 
-        let sizeVn = [[${sizeVn}]];
+        let sizes = [[${sizes}]];
+        let colors = [[${colors}]];
 
-        let sizeUs = [[${sizeUs}]];
-
-        let sizeCm = [[${sizeCm}]];
 
         $(function () {
             formatMoney();
             render();
-            activeSize();
-            sizeGuideRender();
+            renderColor();
+            activeVariant();
         });
 
         function render() {
-            for (let i = 0; i < sizeVn.length; i++) {
+            for (let i = 0; i < sizes.length; i++) {
                 let sizeChoose = `
-            <div class="item" data-size="${sizeUs[i]}US | ${sizeVn[i]}VN | ${sizeCm[i]}CM" data-id="${sizeVn[i]}">
-                ${sizeVn[i]}
+            <div class="item" data-size="${sizes[i].value}" data-id="${sizes[i].id}">
+                ${sizes[i].value}
             </div>
             `;
 
                 $('.size .select-filter').append(sizeChoose);
-            };
+            }
+            ;
         };
 
-        function sizeGuideRender() {
-            let tr = '';
-            for (let i = 0; i < sizeVn.length; i++) {
-                tr += `
-            <tr>
-              <td>${sizeVn[i]}</td>
-              <td>${sizeUs[i]}</td>
-              <td>${sizeCm[i]}</td>
-            </tr>
-            `;
+        function renderColor() {
+            for (let i = 0; i < colors.length; i++) {
+                let colorChoose = `
+      <div class="item" data-color="${colors[i].value}" data-id="${colors[i].id}">
+        ${colors[i].value}
+      </div>
+    `;
+                $('.color .select-filter').append(colorChoose);
             }
-            $('.side-guide-table tbody').html(tr);
         }
 
-        function activeSize() {
-            let availableSizes = [[${availableSizes}]]
+        function activeVariant() {
+            const availableSizes  = [[${availableSizes}]];  // list of size ids
+            const availableColors = [[${availableColors}]]; // list of color ids
+            const selectedSize    = [[${size}]];            // hiện tại selected size
+            const selectedColor   = [[${color}]];           // hiện tại selected color
 
-            for (let i = 0; i < sizeVn.length; i++) {
-                if (sizeVn[i] == [[${size}]]) {
-                    $('.size-details').text(sizeUs[i] + "US | " + sizeVn[i] + "VN | " + sizeCm[i] + "CM")
-                    break;
+            // ===== RESET =====
+            $('.size .item').addClass('cross').removeClass('size-choose');
+            $('.color .item').addClass('cross').removeClass('color-choose');
+
+            let sizeText  = '';
+            let colorText = '';
+
+            // ===== SET SIZE TEXT =====
+            if (selectedSize) {
+                const sizeItem = sizes.find(s => s.id == selectedSize);
+                if (sizeItem) {
+                    sizeText = sizeItem.value;
+                    $(`.size .item[data-id='${selectedSize}']`).addClass('size-choose').removeClass('cross');
                 }
             }
 
-            $('.size .item').addClass('cross')
-            if (![[${notFoundSize}]]) {
-                $(`.item[data-size='${$('.size-details').text()}']`).addClass('size-choose').removeClass('cross');
+            // ===== SET COLOR TEXT =====
+            if (selectedColor) {
+                const colorItem = colors.find(c => c.id == selectedColor);
+                if (colorItem) {
+                    colorText = colorItem.value;
+                    $(`.color .item[data-id='${selectedColor}']`).addClass('color-choose').removeClass('cross');
+                }
             }
 
-            for (let i = 0; i < availableSizes.length; i++) {
-                $(`.item[data-id='${availableSizes[i]}']`).removeClass('cross');
+            // ===== UPDATE .size-details TEXT =====
+            if (sizeText || colorText) {
+                $('.size-details').text(`${sizeText}${sizeText && colorText ? ' / ' : ''}${colorText}`);
+            } else {
+                $('.size-details').text('Chọn size / màu');
             }
+
+            // ===== ENABLE AVAILABLE SIZES =====
+            availableSizes.forEach(id => {
+                $(`.size .item[data-id='${id}']`).removeClass('cross');
+            });
+
+            // ===== ENABLE AVAILABLE COLORS =====
+            availableColors.forEach(id => {
+                $(`.color .item[data-id='${id}']`).removeClass('cross');
+            });
+            selectedVariant.size = sizeText;
+            selectedVariant.color = colorText;
         }
+
         $('#btn-apply-coupon').click(function() {
             let coupon = $('#in-coupon').val();
             if (coupon == "") {
@@ -235,6 +267,7 @@
         })
 
         $('#btn-buy-now').click(function() {
+            debugger
             let receiverName = $('#receiver_name').val();
             let receiverPhone = $('#receiver_phone').val();
             let receiverAddress = $('#receiver_address').val();
@@ -266,8 +299,10 @@
                 isValid = false;
             }
             let size = $('.size-choose').data("id");
-            if (size == null || size == "") {
-                $('.not-found-size').show();
+            let color = $('.color-choose').data("id");
+
+            if (!size || !color) {
+                toastr.warning("Vui lòng chọn kích thước và màu sắc của sản phẩm!");
                 isValid = false;
             }
 
@@ -275,6 +310,7 @@
                 req = {
                     product_id: [[${product.id}]],
                     size: size,
+                    color:color,
                     receiver_name: receiverName,
                     receiver_phone: receiverPhone,
                     receiver_address: receiverAddress,

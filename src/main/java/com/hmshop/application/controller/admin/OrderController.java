@@ -110,9 +110,11 @@ public class OrderController {
             }
 
             // Check size available
-            boolean sizeIsAvailable = productService.checkProductSizeAvailable(order.getProduct().getId(), order.getSize());
+            boolean sizeIsAvailable = productService.checkProductSizeAvailable(order.getProduct().getId(), order.getSize(),order.getColor());
             model.addAttribute("sizeIsAvailable", sizeIsAvailable);
         }
+        model.addAttribute("sizeMap", PRODUCT_SIZE_MAP);
+        model.addAttribute("colorMap", PRODUCT_COLOR_MAP);
 
         return "admin/order/edit";
     }
@@ -138,7 +140,8 @@ public class OrderController {
         User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
         List<OrderInfoDTO> orderList = orderService.getListOrderOfPersonByStatus(ORDER_STATUS, user.getId());
         model.addAttribute("orderList", orderList);
-
+        model.addAttribute("sizeMap", PRODUCT_SIZE_MAP);
+        model.addAttribute("colorMap", PRODUCT_COLOR_MAP);
         return "shop/order_history";
     }
 
@@ -164,7 +167,8 @@ public class OrderController {
             return "error/404";
         }
         model.addAttribute("order", order);
-
+        model.addAttribute("sizeMap", PRODUCT_SIZE_MAP);
+        model.addAttribute("colorMap", PRODUCT_COLOR_MAP);
         if (order.getStatus() == ORDER_STATUS) {
             model.addAttribute("canCancel", true);
         } else {

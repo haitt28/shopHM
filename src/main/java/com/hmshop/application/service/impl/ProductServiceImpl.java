@@ -1,5 +1,8 @@
 package com.hmshop.application.service.impl;
 
+import com.hmshop.application.entity.Coupon;
+import com.hmshop.application.entity.Product;
+import com.hmshop.application.entity.ProductVariant;
 import com.hmshop.application.exception.BadRequestException;
 import com.hmshop.application.exception.InternalServerException;
 import com.hmshop.application.exception.NotFoundException;
@@ -9,23 +12,19 @@ import com.hmshop.application.model.dto.PageableDTO;
 import com.hmshop.application.model.dto.ProductInfoDTO;
 import com.hmshop.application.model.dto.ShortProductInfoDTO;
 import com.hmshop.application.model.mapper.ProductMapper;
-import com.hmshop.application.repository.OrderRepository;
-import com.hmshop.application.repository.ProductRepository;
-import com.hmshop.application.repository.ProductSizeRepository;
-import com.hmshop.application.repository.CouponRepository;
-import com.hmshop.application.entity.Product;
-import com.hmshop.application.entity.ProductSize;
-import com.hmshop.application.entity.Coupon;
 import com.hmshop.application.model.request.CreateProductRequest;
 import com.hmshop.application.model.request.CreateSizeCountRequest;
 import com.hmshop.application.model.request.FilterProductRequest;
 import com.hmshop.application.model.request.UpdateFeedBackRequest;
-import com.hmshop.application.service.ProductService;
+import com.hmshop.application.repository.CouponRepository;
+import com.hmshop.application.repository.OrderRepository;
+import com.hmshop.application.repository.ProductRepository;
+import com.hmshop.application.repository.ProductVariantRepository;
 import com.hmshop.application.service.CouponService;
+import com.hmshop.application.service.ProductService;
 import com.hmshop.application.utils.PageUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +43,7 @@ import static com.hmshop.application.Constant.Constant.*;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final ProductSizeRepository productSizeRepository;
+    private final ProductVariantRepository productVariantRepository;
     private final CouponService couponService;
     private final CouponRepository couponRepository;
     private final OrderRepository orderRepository;
@@ -157,7 +156,7 @@ public class ProductServiceImpl implements ProductService {
 
         try {
             // Delete product size
-            productSizeRepository.deleteByProductId(id);
+            productVariantRepository.deleteByProductId(id);
 
             productRepository.deleteById(id);
         } catch (Exception ex) {
@@ -237,7 +236,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<Integer> getListAvailableSize(String id) {
-        return productSizeRepository.findAllSizeOfProduct(id);
+        return productVariantRepository.findAllSizeOfProduct(id);
     }
 
     @Override
@@ -263,17 +262,18 @@ public class ProductServiceImpl implements ProductService {
 
 //        Optional<ProductSize> productSizeOld = productSizeRepository.getProductSizeBySize(createSizeCountRequest.getSize(),createSizeCountRequest.getProductId());
 
-        ProductSize productSize = new ProductSize();
-        productSize.setProductId(createSizeCountRequest.getProductId());
-        productSize.setSize(createSizeCountRequest.getSize());
-        productSize.setQuantity(createSizeCountRequest.getCount());
+        ProductVariant productVariant = new ProductVariant();
+        productVariant.setProductId(createSizeCountRequest.getProductId());
+        productVariant.setColor(createSizeCountRequest.getColor());
+        productVariant.setSize(createSizeCountRequest.getSize());
+        productVariant.setQuantity(createSizeCountRequest.getCount());
 
-        productSizeRepository.save(productSize);
+        productVariantRepository.save(productVariant);
     }
 
     @Override
-    public List<ProductSize> getListSizeOfProduct(String id) {
-        return productSizeRepository.findByProductId(id);
+    public List<ProductVariant> getListSizeOfProduct(String id) {
+        return productVariantRepository.findByProductId(id);
     }
 
     @Override
@@ -287,9 +287,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean checkProductSizeAvailable(String id, int size) {
-        ProductSize productSize = productSizeRepository.checkProductAndSizeAvailable(id, size);
-        if (productSize != null) {
+    public boolean checkProductSizeAvailable(String id, int size,Integer color) {
+        ProductVariant productVariant = productVariantRepository.checkProductAndSizeAvailableV2(id, size,color);
+        if (productVariant != null) {
             return true;
         }
         return false;

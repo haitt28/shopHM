@@ -1,12 +1,12 @@
 package com.hmshop.application.service;
 
-import com.hmshop.application.entity.ProductSize;
+import com.hmshop.application.entity.Coupon;
+import com.hmshop.application.entity.Product;
+import com.hmshop.application.entity.ProductVariant;
 import com.hmshop.application.model.dto.DetailProductInfoDTO;
 import com.hmshop.application.model.dto.PageableDTO;
 import com.hmshop.application.model.dto.ProductInfoDTO;
 import com.hmshop.application.model.dto.ShortProductInfoDTO;
-import com.hmshop.application.entity.Product;
-import com.hmshop.application.entity.Coupon;
 import com.hmshop.application.model.request.CreateProductRequest;
 import com.hmshop.application.model.request.CreateSizeCountRequest;
 import com.hmshop.application.model.request.FilterProductRequest;
@@ -59,7 +59,7 @@ public interface ProductService {
     void createSizeCount(CreateSizeCountRequest createSizeCountRequest);
 
     //Lấy size của sản phẩm
-    List<ProductSize> getListSizeOfProduct(String id);
+    List<ProductVariant> getListSizeOfProduct(String id);
 
     List<ShortProductInfoDTO> getListProduct();
 
@@ -67,7 +67,7 @@ public interface ProductService {
     List<ShortProductInfoDTO> getAvailableProducts();
 
     //Check size sản phẩm
-    boolean checkProductSizeAvailable(String id, int size);
+    boolean checkProductSizeAvailable(String id, int size, Integer color);
 
     //Kiểm tra sản phẩm có khuyến mại
     List<ProductInfoDTO> checkPublicCoupon(List<ProductInfoDTO> products);

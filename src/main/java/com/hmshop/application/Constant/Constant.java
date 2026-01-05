@@ -5,6 +5,8 @@ import com.hmshop.application.model.ProductOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Constant {
 
@@ -50,6 +52,21 @@ public class Constant {
             new ProductOption(8, "Tím"),
             new ProductOption(9, "Nâu")
     );
+
+    public static final Map<Integer, String> PRODUCT_SIZE_MAP =
+            PRODUCT_SIZE.stream()
+                    .collect(Collectors.toMap(
+                            ProductOption::getId,
+                            ProductOption::getValue
+                    ));
+
+    public static final Map<Integer, String> PRODUCT_COLOR_MAP =
+            PRODUCT_COLOR.stream()
+                    .collect(Collectors.toMap(
+                            ProductOption::getId,
+                            ProductOption::getValue
+                    ));
+
 
     //Size giày
     public static final List<Integer> SIZE_VN = new ArrayList<>(Arrays.asList(35, 36, 37, 38, 39, 40, 41, 42));

@@ -9,14 +9,13 @@ import com.hmshop.application.model.dto.OrderInfoDTO;
 import com.hmshop.application.model.request.CreateOrderRequest;
 import com.hmshop.application.model.request.UpdateDetailOrder;
 import com.hmshop.application.model.request.UpdateStatusOrderRequest;
+import com.hmshop.application.repository.MetricsRepository;
 import com.hmshop.application.repository.OrderRepository;
 import com.hmshop.application.repository.ProductRepository;
-import com.hmshop.application.repository.ProductSizeRepository;
-import com.hmshop.application.repository.MetricsRepository;
-import com.hmshop.application.service.OrderService;
+import com.hmshop.application.repository.ProductVariantRepository;
 import com.hmshop.application.service.CouponService;
+import com.hmshop.application.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +33,7 @@ import static com.hmshop.application.Constant.Constant.*;
 public class OrderServiceImpl implements OrderService {
 
     private final ProductRepository productRepository;
-    private final ProductSizeRepository productSizeRepository;
+    private final ProductVariantRepository productVariantRepository;
     private final OrderRepository orderRepository;
     private final CouponService couponService;
     private final MetricsRepository metricsRepository;
@@ -58,9 +57,11 @@ public class OrderServiceImpl implements OrderService {
         if (product.isEmpty()) {
             throw new NotFoundException("Sản phẩm không tồn tại!");
         }
+        Integer size = createOrderRequest.getSize();
+        Integer color = createOrderRequest.getColor();
 
         //Kiểm tra size có sẵn
-        ProductSize productSize = productSizeRepository.checkProductAndSizeAvailable(createOrderRequest.getProductId(), createOrderRequest.getSize());
+        ProductVariant productSize = productVariantRepository.checkProductAndSizeAvailableV2(createOrderRequest.getProductId(), size,color);
         if (productSize == null) {
             throw new BadRequestException("Size giày sản phẩm tạm hết, Vui lòng chọn sản phẩm khác!");
         }
@@ -80,6 +81,7 @@ public class OrderServiceImpl implements OrderService {
         order.setReceiverPhone(createOrderRequest.getReceiverPhone());
         order.setNote(createOrderRequest.getNote());
         order.setSize(createOrderRequest.getSize());
+        order.setColor(createOrderRequest.getColor());
         order.setPrice(createOrderRequest.getProductPrice());
         order.setTotalPrice(createOrderRequest.getTotalPrice());
         order.setStatus(ORDER_STATUS);
@@ -115,7 +117,7 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("Giá sản phẩm thay đổi vui lòng đặt hàng lại");
         }
 
-        ProductSize productSize = productSizeRepository.checkProductAndSizeAvailable(updateDetailOrder.getProductId(), updateDetailOrder.getSize());
+        ProductVariant productSize = productVariantRepository.checkProductAndSizeAvailable(updateDetailOrder.getProductId(), updateDetailOrder.getSize());
         if (productSize == null) {
             throw new BadRequestException("Size giày sản phẩm tạm hết, Vui lòng chọn sản phẩm khác");
         }
@@ -190,11 +192,11 @@ public class OrderServiceImpl implements OrderService {
                 //Đơn hàng ở trạng thái đang vận chuyển
             } else if (updateStatusOrderRequest.getStatus() == DELIVERY_STATUS) {
                 //Trừ đi một sản phẩm
-                productSizeRepository.minusOneProductBySize(order.getProduct().getId(), order.getSize());
+                productVariantRepository.minusOneProductBySize(order.getProduct().getId(), order.getSize());
                 //Đơn hàng ở trạng thái đã giao hàng
             } else if (updateStatusOrderRequest.getStatus() == COMPLETED_STATUS) {
                 //Trừ đi một sản phẩm và cộng một sản phẩm vào sản phẩm đã bán và cộng tiền
-                productSizeRepository.minusOneProductBySize(order.getProduct().getId(), order.getSize());
+                productVariantRepository.minusOneProductBySize(order.getProduct().getId(), order.getSize());
                 productRepository.plusOneProductTotalSold(order.getProduct().getId());
                 metrics(order.getTotalPrice(), order.getQuantity(), order);
             } else if (updateStatusOrderRequest.getStatus() != CANCELED_STATUS) {
@@ -210,11 +212,11 @@ public class OrderServiceImpl implements OrderService {
                 //Đơn hàng ở trạng thái đã hủy
             } else if (updateStatusOrderRequest.getStatus() == RETURNED_STATUS) {
                 //Cộng lại một sản phẩm đã bị trừ
-                productSizeRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
+                productVariantRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
                 //Đơn hàng ở trạng thái đã trả hàng
             } else if (updateStatusOrderRequest.getStatus() == CANCELED_STATUS) {
                 //Cộng lại một sản phẩm đã bị trừ
-                productSizeRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
+                productVariantRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
             } else if (updateStatusOrderRequest.getStatus() != DELIVERY_STATUS) {
                 throw new BadRequestException("Không thế chuyển sang trạng thái này");
             }
@@ -223,7 +225,7 @@ public class OrderServiceImpl implements OrderService {
             //Đơn hàng đang ở trạng thái đã hủy
             if (updateStatusOrderRequest.getStatus() == RETURNED_STATUS) {
                 //Cộng một sản phẩm đã bị trừ và trừ đi một sản phẩm đã bán và trừ số tiền
-                productSizeRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
+                productVariantRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
                 productRepository.minusOneProductTotalSold(order.getProduct().getId());
                 updateMetric(order.getTotalPrice(), order.getQuantity(), order);
             } else if (updateStatusOrderRequest.getStatus() != COMPLETED_STATUS) {
@@ -250,17 +252,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderInfoDTO> getListOrderOfPersonByStatus(int status, long userId) {
-        List<OrderInfoDTO> list = orderRepository.getListOrderOfPersonByStatus(status, userId);
-
-        for (OrderInfoDTO dto : list) {
-            for (int i = 0; i < PRODUCT_SIZE.size(); i++) {
-                if (SIZE_VN.get(i) == dto.getSizeVn()) {
-                    dto.setSizeUs(SIZE_US[i]);
-                    dto.setSizeCm(SIZE_CM[i]);
-                }
-            }
-        }
-        return list;
+        return orderRepository.getListOrderOfPersonByStatus(status, userId);
     }
 
     @Override
@@ -281,14 +273,6 @@ public class OrderServiceImpl implements OrderService {
         } else if (order.getStatus() == RETURNED_STATUS) {
             order.setStatusText("Đơn hàng đã hủy");
         }
-
-        for (int i = 0; i < SIZE_VN.size(); i++) {
-            if (SIZE_VN.get(i) == order.getSizeVn()) {
-                order.setSizeUs(SIZE_US[i]);
-                order.setSizeCm(SIZE_CM[i]);
-            }
-        }
-
         return order;
     }
 

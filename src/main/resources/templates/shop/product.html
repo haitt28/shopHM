@@ -96,12 +96,12 @@
             <div class="sidebar-toggle"><i class="fas fa-sliders-h"></i></div>
             <aside class="sidebar-shop col-lg-3 order-lg-first mobile-sidebar">
                 <div class="sidebar-wrapper filter-bar small-size">
-                    <div class="filter-header content">
-                        <div class="left-side d-flex align-items-center"><i class="fas fa-sliders-h"></i>
-                            <div class="text">Lọc</div>
-                        </div>
-                        <button class="clear-filter btn btn-primary" disabled="disabled">Bỏ lọc</button>
-                    </div>
+<!--                    <div class="filter-header content">-->
+<!--                        <div class="left-side d-flex align-items-center"><i class="fas fa-sliders-h"></i>-->
+<!--                            <div class="text">Lọc</div>-->
+<!--                        </div>-->
+
+<!--                    </div>-->
                     <div class="widget">
                         <h3 class="widget-title">
                             <a data-toggle="collapse" href="#widget-body-2" role="button" aria-expanded="true"
@@ -152,8 +152,8 @@
                         <!-- Size -->
                         <div class="size content" id="widget-body-3">
                             <div class="select-filter collapse show" id="size-collapse">
-                                <th:block th:each="size : ${sizeVn}">
-                                    <div class="item check-size" th:data-id="${size}" th:text="${size}"></div>
+                                <th:block th:each="size : ${sizes}">
+                                    <div class="item check-size" th:data-id="${size.id}" th:text="${size.value}"></div>
                                 </th:block>
                             </div>
                         </div>
@@ -168,11 +168,12 @@
                         <div class="collapse show" id="widget-body-4">
                             <div class="widget-body">
                                 <!-- Price -->
-                                <div class="price-range content">
+                                <div class="price-range content price-vertical">
                                     <input class="form-control price-input" id="from-price" type="text" placeholder="Từ">
                                     <input class="form-control price-input" id="to-price" type="text" placeholder="Đến"pattern="[0-9]">
                                     <button class="btn btn-primary apply-price red-btn" id="apply-price-web">Áp dụng
                                     </button>
+                                    <button class="clear-filter btn btn-primary" disabled="disabled">Bỏ lọc</button>
                                 </div>
                             </div><!-- End .widget-body -->
                         </div><!-- End .collapse -->

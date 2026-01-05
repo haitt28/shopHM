@@ -26,17 +26,15 @@ public class OrderDetailDTO {
 
     private String statusText;
 
-    private int sizeVn;
+    private Integer size;
 
-    private double sizeUs;
-
-    private double sizeCm;
+    private Integer color;
 
     private String productName;
 
     private String productImg;
 
-    public OrderDetailDTO (long id, long totalPrice, long productPrice, String receiverName, String receiverPhone, String receiverAddress, int status, int sizeVn, String productName, String productImg) {
+    public OrderDetailDTO (long id, long totalPrice, long productPrice, String receiverName, String receiverPhone, String receiverAddress, int status, Integer size,Integer color, String productName, String productImg) {
         this.id = id;
         this.totalPrice = totalPrice;
         this.productPrice = productPrice;
@@ -44,7 +42,8 @@ public class OrderDetailDTO {
         this.receiverPhone = receiverPhone;
         this.receiverAddress = receiverAddress;
         this.status = status;
-        this.sizeVn = sizeVn;
+        this.size = size;
+        this.color = color;
         this.productName = productName;
         this.productImg = productImg;
     }
