@@ -80,9 +80,9 @@ public interface ProductRepository extends JpaRepository<Product, String> {
             "ON product.id = product_category.product_id " +
             "WHERE product.status = 1 AND product.brand_id IN (?1) AND product_category.category_id IN (?2) " +
             "AND product.price > ?3 AND product.price < ?4) as d " +
-            "INNER JOIN product_size " +
-            "ON product_size.product_id = d.id " +
-            "WHERE product_size.size IN (?5)")
+            "INNER JOIN product_variant " +
+            "ON product_variant.product_id = d.id " +
+            "WHERE product_variant.size IN (?5)")
     int countProductBySize(List<Long> brands, List<Long> categories, long minPrice, long maxPrice, List<Integer> sizes);
 
     //Tìm kiến sản phẩm k theo size

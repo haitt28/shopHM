@@ -111,7 +111,7 @@ import java.util.List;
         name = "getAllBySizeAvailable",
         resultSetMapping = "productInfoAndAvailableSize",
         query = "SELECT p.id, p.name, p.sale_price as price, " +
-                "(SELECT JSON_ARRAYAGG(ps.size) FROM product_size ps WHERE ps.product_id = p.id AND ps.quantity > 0) AS sizes " +
+                "(SELECT JSON_ARRAYAGG(ps.size) FROM product_variant ps WHERE ps.product_id = p.id AND ps.quantity > 0) AS sizes " +
                 "FROM product p"
 )
 @NamedNativeQuery(
@@ -125,9 +125,9 @@ import java.util.List;
                 "ON product.id = product_category.product_id " +
                 "WHERE product.status = 1 AND product.brand_id IN (?1) AND product_category.category_id IN (?2) " +
                 "AND product.price > ?3 AND product.price < ?4) as d " +
-                "INNER JOIN product_size " +
-                "ON product_size.product_id = d.id " +
-                "WHERE product_size.size IN (?5) " +
+                "INNER JOIN product_variant " +
+                "ON product_variant.product_id = d.id " +
+                "WHERE product_variant.size IN (?5) " +
                 "LIMIT ?6 "+
                 "OFFSET ?7"
 )
