@@ -41,7 +41,7 @@
             <div class="main-content">
                 <div class="header"><a class="go-back-previous-page" href="/tai-khoan/lich-su-giao-dich"><i class="fas fa-chevron-left"></i> Trở lại</a>
                     <div class="order-status-wrapper">
-                        <div class="order-number-wrapper">Mã đơn <span class="order-number" th:text="'#'+${order.id}"></span></div>
+                        <div class="order-number-wrapper">Mã đơn <span class="order-number" th:text="'#'+${order.getCode()}"></span></div>
                         <div class="status" th:text="${order.statusText}"></div>
                     </div>
                 </div>
@@ -51,7 +51,7 @@
                         <div class="thumbnails"><img class="img-fluid" th:src="${order.productImg}" th:alt="${order.productName}"/></div>
                         <div class="product-info"><span class="name" th:text="${order.productName}"></span>
                             <div class="size">
-                                <span th:text="${order.size != null and order.color != null} ? ${sizeMap[order.size]} + ' / ' + ${colorMap[order.color]} : 'Chưa chọn'"></span>
+                                <span th:text="${order.size != null and order.colorId != null} ? ${sizeMap[order.size]} + ' / ' + ${colorMap[order.colorId]} : 'Chưa chọn'"></span>
                             </div>
                         </div>
                     </div>
@@ -77,7 +77,7 @@
                         <div class="product-info-wrapper">
                             <div class="product-info"><span class="name" th:text="${order.productName}"></span>
                                 <div class="size">
-                                    <span th:text="${order.size} + ' / ' + ${order.color}"></span>
+                                    <span th:text="${order.size} + ' / ' + ${order.colorId}"></span>
                                 </div>
                             </div>
                         </div>

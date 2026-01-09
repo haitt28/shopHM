@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface OrderService {
     Page<Order> adminGetListOrders(String id, String name, String phone, String status, String product, int page);
 

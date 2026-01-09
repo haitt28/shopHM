@@ -47,12 +47,12 @@
             <div class="row">
                 <div class="col-sm-4">
                     <div class="mb-3">
-                        <button id="addToTable" class="btn btn-primary" data-toggle="modal"
+                        <button id="addToTable" class="btn btn-success" data-toggle="modal"
                                 data-target="#modal-add-new-category">Thêm mới danh mục <i
                                 class="fas fa-plus"></i></button>
-                        <a href="/admin/categories" class="btn btn-primary">Refresh <i
+                        <a href="/admin/categories" class="btn btn-secondary">Tải lại <i
                                 class="fas fa-redo-alt"></i></a>
-                        <button id="btn-search" class="btn btn-primary">Tìm kiếm <i
+                        <button id="btn-search" class="btn btn-outline-primary">Tìm kiếm <i
                                 class="fas fa-search"></i></button>
                     </div>
                 </div>
@@ -60,7 +60,6 @@
             <table class="table table-bordered table-striped mb-0" id="datatable-editable">
                 <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Tên danh mục</th>
                     <th>Trạng thái danh mục</th>
                     <th>Thứ tự danh mục</th>
@@ -86,7 +85,6 @@
                         <th></th>
                         <th></th>
                         <th></th>
-                        <th></th>
                         <input type="hidden" name="page" id="page">
                     </form>
                 </tr>
@@ -94,7 +92,6 @@
                 <tbody>
                 <th:block th:each="category : ${categories}">
                     <tr data-item-id="1" th:attr="data-id = ${category.id}">
-                        <td th:text="${category.id}"></td>
                         <td class="category-name" th:data-id="${category.id}" th:text="${category.name}"></td>
                         <th:block th:if="${category.status} == true">
                             <td><label class="switch" style="margin-left: 60px;">
@@ -111,7 +108,7 @@
                         <td th:text="${category.order}"></td>
                         <td th:text="${#dates.format(category.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
                         <td th:text="${#dates.format(category.modifiedAt, 'dd-MM-yyyy HH:mm')}"></td>
-                        <td class="actions">
+                        <td class="actions center">
                             <a href="#" class="on-default edit-row edit-category" th:data-id="${category.id}"><i
                                     class="fas fa-pencil-alt"></i></a>
                             <a href="#" id="btn-delete-category" class="on-default remove-row delete-category"

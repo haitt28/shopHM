@@ -8,12 +8,13 @@ import com.hmshop.application.service.ImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.List;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
 

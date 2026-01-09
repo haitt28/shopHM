@@ -47,7 +47,7 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="mb-3">
-                            <a href="/admin/products" class="btn btn-primary"><i
+                            <a href="/admin/products" class="btn btn-outline-secondary"><i
                                     class="fas fa-chevron-left"></i> Trở về</a>
                             <button type="submit" id="addToTable" class="btn btn-primary">Cập nhật sản phẩm <i
                                     class="fas fa-plus"></i></button>
@@ -215,7 +215,7 @@
                                         <label for="size">Màu</label>&emsp;
                                         <select class="form-control" id="color">
                                             <th:block th:each="color : ${colors}">
-                                                <option th:value="${color.id}" th:text="${color.value}"></option>
+                                                <option th:value="${color.getId()}" th:text="${color.getName()}"></option>
                                             </th:block>
                                         </select>
                                     </div>
@@ -226,7 +226,7 @@
                                     <div class=" form-group col-md-3">
                                         <label for="">Thực hiện</label>
                                         <br>
-                                        <button type="button" id="" class="btn btn-primary btn-update-size-count">Cập
+                                        <button type="button" id="" class="btn btn-outline-primary btn-update-size-count">Cập
                                             nhật số lượng <i class="fas fa-plus"></i></button>
                                         <br>
                                         <span class="invalid-feedback"
@@ -252,9 +252,9 @@
                                             th:data-size="${ps.size}">
                                         </td>
 
-                                        <td th:text="${colorMap[ps.color]}"
+                                        <td th:text="${ps.getColor().getName()}"
                                             class="product-color"
-                                            th:data-color="${ps.color}">
+                                            th:data-color="${ps.getColor().getId()}">
                                         </td>
                                         <td th:text="${ps.quantity}" class="product-count"></td>
                                     </tr>

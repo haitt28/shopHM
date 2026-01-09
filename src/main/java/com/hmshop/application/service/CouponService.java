@@ -5,9 +5,9 @@ import com.hmshop.application.model.request.CreateCouponRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-@Service
 public interface CouponService {
 
     Page<Coupon> adminGetListCoupon(String code, String name, String publish, String active, int page);
@@ -24,7 +24,7 @@ public interface CouponService {
     Coupon checkPublicCoupon();
 
     //Tính giá sản phẩm khi có khuyến mại
-    long calculateCouponPrice(long price, Coupon coupon);
+    BigDecimal calculateCouponPrice(BigDecimal price, Coupon coupon);
 
     //Lấy khuyến mại theo mã code
     Coupon checkCoupon(String code);

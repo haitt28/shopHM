@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query(value = "SELECT * FROM orders " +
-            "WHERE id LIKE CONCAT('%',?1,'%') " +
+            "WHERE code LIKE CONCAT('%',?1,'%') " +
             "AND receiver_name LIKE CONCAT('%',?2,'%') " +
             "AND receiver_phone LIKE CONCAT('%',?3,'%') " +
             "AND status LIKE CONCAT('%',?4,'%') " +

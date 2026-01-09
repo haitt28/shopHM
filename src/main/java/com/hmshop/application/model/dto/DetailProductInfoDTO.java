@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class DetailProductInfoDTO {
 
     private String slug;
 
-    private long price;
+    private BigDecimal price;
 
     private int views;
 
@@ -31,7 +32,7 @@ public class DetailProductInfoDTO {
 
     private List<String> feedbackImages;
 
-    private long CouponPrice;
+    private BigDecimal CouponPrice;
 
     private String couponCode;
 

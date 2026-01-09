@@ -1,5 +1,6 @@
 package com.hmshop.application.service.impl;
 
+import com.hmshop.application.entity.Color;
 import com.hmshop.application.entity.Coupon;
 import com.hmshop.application.entity.Product;
 import com.hmshop.application.entity.ProductVariant;
@@ -16,10 +17,7 @@ import com.hmshop.application.model.request.CreateProductRequest;
 import com.hmshop.application.model.request.CreateSizeCountRequest;
 import com.hmshop.application.model.request.FilterProductRequest;
 import com.hmshop.application.model.request.UpdateFeedBackRequest;
-import com.hmshop.application.repository.CouponRepository;
-import com.hmshop.application.repository.OrderRepository;
-import com.hmshop.application.repository.ProductRepository;
-import com.hmshop.application.repository.ProductVariantRepository;
+import com.hmshop.application.repository.*;
 import com.hmshop.application.service.CouponService;
 import com.hmshop.application.service.ProductService;
 import com.hmshop.application.utils.PageUtil;
@@ -29,16 +27,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
 import static com.hmshop.application.Constant.Constant.*;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
@@ -47,6 +48,7 @@ public class ProductServiceImpl implements ProductService {
     private final CouponService couponService;
     private final CouponRepository couponRepository;
     private final OrderRepository orderRepository;
+    private final ColorRepository colorRepository;
 
     @Override
     public Page<Product> adminGetListProduct(String id, String name, String category, String brand, Integer page) {
@@ -259,12 +261,17 @@ public class ProductServiceImpl implements ProductService {
         if (product.isEmpty()) {
             throw new NotFoundException("Không tìm thấy sản phẩm trong hệ thống!");
         }
-
-//        Optional<ProductSize> productSizeOld = productSizeRepository.getProductSizeBySize(createSizeCountRequest.getSize(),createSizeCountRequest.getProductId());
+        Color color = new Color();
+        Long colorId = createSizeCountRequest.getColor();
+        if(colorId > 0) {
+            color = colorRepository.findById(colorId).orElse(null);
+        }
 
         ProductVariant productVariant = new ProductVariant();
         productVariant.setProductId(createSizeCountRequest.getProductId());
-        productVariant.setColor(createSizeCountRequest.getColor());
+        if(!ObjectUtils.isEmpty(color)) {
+            productVariant.setColor(color);
+        }
         productVariant.setSize(createSizeCountRequest.getSize());
         productVariant.setQuantity(createSizeCountRequest.getCount());
 
@@ -287,7 +294,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean checkProductSizeAvailable(String id, int size,Integer color) {
+    public boolean checkProductSizeAvailable(String id, Integer size,Long color) {
         ProductVariant productVariant = productVariantRepository.checkProductAndSizeAvailableV2(id, size,color);
         if (productVariant != null) {
             return true;
@@ -339,7 +346,19 @@ public class ProductServiceImpl implements ProductService {
             products = productRepository.searchProductBySize(req.getBrands(), req.getCategories(), req.getMinPrice(), req.getMaxPrice(), req.getSizes(), LIMIT_PRODUCT_SHOP, pageUtil.calculateOffset());
             totalItems = productRepository.countProductBySize(req.getBrands(), req.getCategories(), req.getMinPrice(), req.getMaxPrice(), req.getSizes());
         }
+        Coupon coupon = couponRepository.checkHasPublicCoupon();
+        if(!CollectionUtils.isEmpty(products) && !ObjectUtils.isEmpty(coupon)) {
+            products.forEach(p -> {
+                BigDecimal price = BigDecimal.valueOf(
+                        p.getPrice() < 0 ? 0L : p.getPrice()
+                );
 
+                BigDecimal finalPrice =
+                        couponService.calculateCouponPrice(price, coupon);
+                long finalPriceLong = finalPrice.longValue();
+                p.setCouponPrice(finalPriceLong);
+            });
+        }
         //Tính tổng số trang
         int totalPages = pageUtil.calculateTotalPage(totalItems);
 

@@ -9,26 +9,28 @@ import com.hmshop.application.model.dto.OrderInfoDTO;
 import com.hmshop.application.model.request.CreateOrderRequest;
 import com.hmshop.application.model.request.UpdateDetailOrder;
 import com.hmshop.application.model.request.UpdateStatusOrderRequest;
-import com.hmshop.application.repository.MetricsRepository;
-import com.hmshop.application.repository.OrderRepository;
-import com.hmshop.application.repository.ProductRepository;
-import com.hmshop.application.repository.ProductVariantRepository;
+import com.hmshop.application.repository.*;
 import com.hmshop.application.service.CouponService;
 import com.hmshop.application.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.hmshop.application.Constant.Constant.*;
 
-@Controller
+@Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
@@ -37,6 +39,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final CouponService couponService;
     private final MetricsRepository metricsRepository;
+    private final ColorRepository colorRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public Page<Order> adminGetListOrders(String id, String name, String phone, String status, String product, int page) {
@@ -50,6 +54,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public Order createOrder(CreateOrderRequest createOrderRequest, long userId) {
 
         //Kiểm tra sản phẩm có tồn tại
@@ -58,30 +63,38 @@ public class OrderServiceImpl implements OrderService {
             throw new NotFoundException("Sản phẩm không tồn tại!");
         }
         Integer size = createOrderRequest.getSize();
-        Integer color = createOrderRequest.getColor();
+        Long colorId = createOrderRequest.getColor();
+        Color color = new Color();
+        if (colorId != null && colorId > 0) {
+            color = colorRepository.getReferenceById(colorId);
+        }
 
         //Kiểm tra size có sẵn
-        ProductVariant productSize = productVariantRepository.checkProductAndSizeAvailableV2(createOrderRequest.getProductId(), size,color);
-        if (productSize == null) {
+        ProductVariant productSize = productVariantRepository.checkProductAndSizeAvailableV2(createOrderRequest.getProductId(), size,color.getId());
+        if (ObjectUtils.isEmpty(productSize)) {
             throw new BadRequestException("Size giày sản phẩm tạm hết, Vui lòng chọn sản phẩm khác!");
         }
 
         //Kiểm tra giá sản phẩm
-        if (product.get().getSalePrice() != createOrderRequest.getProductPrice()) {
+        if (product.get().getSalePrice()
+                .compareTo(createOrderRequest.getProductPrice()) != 0) {
             throw new BadRequestException("Giá sản phẩm thay đổi, Vui lòng đặt hàng lại!");
         }
         Order order = new Order();
         User user = new User();
+        String code = "HM-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         user.setId(userId);
         order.setCreatedBy(user);
         order.setBuyer(user);
+        order.setCode(code);
         order.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         order.setReceiverAddress(createOrderRequest.getReceiverAddress());
         order.setReceiverName(createOrderRequest.getReceiverName());
         order.setReceiverPhone(createOrderRequest.getReceiverPhone());
+        order.setReceiverEmail(createOrderRequest.getReceiverEmail());
         order.setNote(createOrderRequest.getNote());
         order.setSize(createOrderRequest.getSize());
-        order.setColor(createOrderRequest.getColor());
+        order.setColor(color);
         order.setPrice(createOrderRequest.getProductPrice());
         order.setTotalPrice(createOrderRequest.getTotalPrice());
         order.setStatus(ORDER_STATUS);
@@ -89,11 +102,13 @@ public class OrderServiceImpl implements OrderService {
         order.setProduct(product.get());
 
         orderRepository.save(order);
+        eventPublisher.publishEvent(order);
         return order;
 
     }
 
     @Override
+    @Transactional
     public void updateDetailOrder(UpdateDetailOrder updateDetailOrder, long id, long userId) {
         //Kiểm trả có đơn hàng
         Optional<Order> rs = orderRepository.findById(id);
@@ -128,7 +143,7 @@ public class OrderServiceImpl implements OrderService {
             if (Coupon == null) {
                 throw new NotFoundException("Mã khuyến mãi không tồn tại hoặc chưa được kích hoạt");
             }
-            long CouponPrice = couponService.calculateCouponPrice(updateDetailOrder.getProductPrice(), Coupon);
+            BigDecimal CouponPrice = couponService.calculateCouponPrice(updateDetailOrder.getProductPrice(), Coupon);
             if (CouponPrice != updateDetailOrder.getTotalPrice()) {
                 throw new BadRequestException("Tổng giá trị đơn hàng thay đổi. Vui lòng kiểm tra và đặt lại đơn hàng");
             }
@@ -165,89 +180,51 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void updateStatusOrder(UpdateStatusOrderRequest updateStatusOrderRequest, long orderId, long userId) {
-        Optional<Order> rs = orderRepository.findById(orderId);
-        if (rs.isEmpty()) {
-            throw new NotFoundException("Đơn hàng không tồn tại");
-        }
-        Order order = rs.get();
-        //Kiểm tra trạng thái của đơn hàng
-        boolean check = false;
-        for (Integer status : LIST_ORDER_STATUS) {
-            if (status == updateStatusOrderRequest.getStatus()) {
-                check = true;
-                break;
-            }
-        }
-        if (!check) {
+    @Transactional
+    public void updateStatusOrder(UpdateStatusOrderRequest req, long orderId, long userId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Đơn hàng không tồn tại"));
+
+        int currentStatus = order.getStatus();
+        int newStatus = req.getStatus();
+
+        // ===== 1. Validate status =====
+        if (!LIST_ORDER_STATUS.contains(newStatus)) {
             throw new BadRequestException("Trạng thái đơn hàng không hợp lệ");
         }
-        //Cập nhật trạng thái đơn hàng
-        if (order.getStatus() == ORDER_STATUS) {
-            //Đơn hàng ở trạng thái chờ lấy hàng
-            if (updateStatusOrderRequest.getStatus() == ORDER_STATUS) {
-                order.setReceiverPhone(updateStatusOrderRequest.getReceiverPhone());
-                order.setReceiverName(updateStatusOrderRequest.getReceiverName());
-                order.setReceiverAddress(updateStatusOrderRequest.getReceiverAddress());
-                //Đơn hàng ở trạng thái đang vận chuyển
-            } else if (updateStatusOrderRequest.getStatus() == DELIVERY_STATUS) {
-                //Trừ đi một sản phẩm
-                productVariantRepository.minusOneProductBySize(order.getProduct().getId(), order.getSize());
-                //Đơn hàng ở trạng thái đã giao hàng
-            } else if (updateStatusOrderRequest.getStatus() == COMPLETED_STATUS) {
-                //Trừ đi một sản phẩm và cộng một sản phẩm vào sản phẩm đã bán và cộng tiền
-                productVariantRepository.minusOneProductBySize(order.getProduct().getId(), order.getSize());
-                productRepository.plusOneProductTotalSold(order.getProduct().getId());
-                metrics(order.getTotalPrice(), order.getQuantity(), order);
-            } else if (updateStatusOrderRequest.getStatus() != CANCELED_STATUS) {
-                throw new BadRequestException("Không thế chuyển sang trạng thái này");
-            }
-            //Đơn hàng ở trạng thái đang giao hàng
-        } else if (order.getStatus() == DELIVERY_STATUS) {
-            //Đơn hàng ở trạng thái đã giao hàng
-            if (updateStatusOrderRequest.getStatus() == COMPLETED_STATUS) {
-                //Cộng một sản phẩm vào sản phẩm đã bán và cộng tiền
-                productRepository.plusOneProductTotalSold(order.getProduct().getId());
-                metrics(order.getTotalPrice(), order.getQuantity(), order);
-                //Đơn hàng ở trạng thái đã hủy
-            } else if (updateStatusOrderRequest.getStatus() == RETURNED_STATUS) {
-                //Cộng lại một sản phẩm đã bị trừ
-                productVariantRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
-                //Đơn hàng ở trạng thái đã trả hàng
-            } else if (updateStatusOrderRequest.getStatus() == CANCELED_STATUS) {
-                //Cộng lại một sản phẩm đã bị trừ
-                productVariantRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
-            } else if (updateStatusOrderRequest.getStatus() != DELIVERY_STATUS) {
-                throw new BadRequestException("Không thế chuyển sang trạng thái này");
-            }
-            //Đơn hàng ở trạng thái đã giao hàng
-        } else if (order.getStatus() == COMPLETED_STATUS) {
-            //Đơn hàng đang ở trạng thái đã hủy
-            if (updateStatusOrderRequest.getStatus() == RETURNED_STATUS) {
-                //Cộng một sản phẩm đã bị trừ và trừ đi một sản phẩm đã bán và trừ số tiền
-                productVariantRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
-                productRepository.minusOneProductTotalSold(order.getProduct().getId());
-                updateMetric(order.getTotalPrice(), order.getQuantity(), order);
-            } else if (updateStatusOrderRequest.getStatus() != COMPLETED_STATUS) {
-                throw new BadRequestException("Không thế chuyển sang trạng thái này");
-            }
-        } else {
-            if (order.getStatus() != updateStatusOrderRequest.getStatus()) {
-                throw new BadRequestException("Không thế chuyển đơn hàng sang trạng thái này");
-            }
+
+        // ===== 2. XỬ LÝ THEO TRẠNG THÁI HIỆN TẠI =====
+        switch (currentStatus) {
+
+            case ORDER_STATUS:
+                handleFromOrderStatus(order, req);
+                break;
+
+            case DELIVERY_STATUS:
+                handleFromDeliveryStatus(order, newStatus);
+                break;
+
+            case COMPLETED_STATUS:
+                handleFromCompletedStatus(order, newStatus);
+                break;
+
+            default:
+                if (currentStatus != newStatus) {
+                    throw new BadRequestException("Không thể chuyển trạng thái");
+                }
         }
 
+        // ===== 3. UPDATE COMMON INFO =====
         User user = new User();
         user.setId(userId);
+
+        order.setStatus(newStatus);
+        order.setNote(req.getNote());
         order.setModifiedBy(user);
         order.setModifiedAt(new Timestamp(System.currentTimeMillis()));
-        order.setNote(updateStatusOrderRequest.getNote());
-        order.setStatus(updateStatusOrderRequest.getStatus());
-        try {
-            orderRepository.save(order);
-        } catch (Exception e) {
-            throw new InternalServerException("Lỗi khi cập nhật trạng thái");
-        }
+
+        orderRepository.save(order);
     }
 
     @Override
@@ -299,33 +276,97 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.count();
     }
 
-    public void metrics(long amount, int quantity, Order order) {
-        Metrics metrics = metricsRepository.findByCreatedAT();
-        if (metrics != null){
-            metrics.setOrder(order);
-            metrics.setSales(metrics.getSales() + amount);
-            metrics.setQuantity(metrics.getQuantity() + quantity);
-            metrics.setProfit(metrics.getSales() - (metrics.getQuantity() * order.getProduct().getPrice()));
-            metricsRepository.save(metrics);
-        }else {
-            Metrics metrics1 = new Metrics();
-            metrics1.setOrder(order);
-            metrics1.setSales(amount);
-            metrics1.setQuantity(quantity);
-            metrics1.setProfit(amount - (quantity * order.getProduct().getPrice()));
-            metrics1.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-            metricsRepository.save(metrics1);
-        }
+    /**
+     * Tạo metric cho 1 đơn hàng
+     * KHÔNG cộng dồn
+     * KHÔNG lưu giá vốn
+     */
+    public void createMetric(Order order) {
+
+        // ===== 1. DOANH THU =====
+        // Tiền khách thực trả (đã trừ khuyến mãi)
+        BigDecimal sales = order.getTotalPrice();
+
+        // ===== 2. SỐ LƯỢNG =====
+        int quantity = order.getQuantity();
+
+        // ===== 3. GIÁ NHẬP (CHỈ DÙNG ĐỂ TÍNH PROFIT) =====
+        BigDecimal importPrice = order.getProduct().getPrice();
+
+        // ===== 4. TÍNH PROFIT =====
+        // profit = sales - (giá nhập * số lượng)
+        BigDecimal profit = sales.subtract(
+                importPrice.multiply(BigDecimal.valueOf(quantity))
+        );
+
+        // ===== 5. TẠO METRIC =====
+        Metrics metric = new Metrics();
+        metric.setOrder(order);
+        metric.setSales(sales);
+        metric.setQuantity(quantity);
+        metric.setProfit(profit);
+        metric.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+
+        // ===== 6. LƯU DB =====
+        metricsRepository.save(metric);
     }
 
-    public void updateMetric(long amount, int quantity, Order order) {
-        Metrics metrics = metricsRepository.findByCreatedAT();
-        if (metrics != null) {
-            metrics.setOrder(order);
-            metrics.setSales(metrics.getSales() - amount);
-            metrics.setQuantity(metrics.getQuantity() - quantity);
-            metrics.setProfit(metrics.getSales() - (metrics.getQuantity() * order.getProduct().getPrice()));
-            metricsRepository.save(metrics);
+    private void handleFromOrderStatus(Order order, UpdateStatusOrderRequest req) {
+
+        if (req.getStatus() == ORDER_STATUS) {
+            order.setReceiverName(req.getReceiverName());
+            order.setReceiverPhone(req.getReceiverPhone());
+            order.setReceiverAddress(req.getReceiverAddress());
+            return;
         }
+
+        if (req.getStatus() == DELIVERY_STATUS) {
+            productVariantRepository.minusOneProductBySize(
+                    order.getProduct().getId(), order.getSize()
+            );
+            return;
+        }
+
+        throw new BadRequestException("Không thể chuyển trạng thái");
+    }
+
+    private void handleFromDeliveryStatus(Order order, int newStatus) {
+
+        if (newStatus == COMPLETED_STATUS) {
+
+            productRepository.plusOneProductTotalSold(order.getProduct().getId());
+
+            // ✅ CHỈ TẠO METRIC 1 LẦN DUY NHẤT
+            createMetric(order);
+            return;
+        }
+
+        if (newStatus == CANCELED_STATUS || newStatus == RETURNED_STATUS) {
+            productVariantRepository.plusOneProductBySize(
+                    order.getProduct().getId(), order.getSize()
+            );
+            return;
+        }
+
+        throw new BadRequestException("Không thể chuyển trạng thái");
+    }
+
+    private void handleFromCompletedStatus(Order order, int newStatus) {
+
+        if (newStatus == RETURNED_STATUS) {
+
+            productVariantRepository.plusOneProductBySize(
+                    order.getProduct().getId(), order.getSize()
+            );
+
+            productRepository.minusOneProductTotalSold(order.getProduct().getId());
+
+            // 👉 XÓA metric hoặc đánh dấu invalid
+            metricsRepository.deleteByOrderId(order.getId());
+
+            return;
+        }
+
+        throw new BadRequestException("Không thể chuyển trạng thái");
     }
 }

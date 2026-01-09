@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @SqlResultSetMappings(
@@ -19,9 +20,11 @@ import java.sql.Timestamp;
                                 targetClass = OrderInfoDTO.class,
                                 columns = {
                                         @ColumnResult(name = "id", type = Long.class),
+                                        @ColumnResult(name = "product_id", type = String.class),
+                                        @ColumnResult(name = "code", type = String.class),
                                         @ColumnResult(name = "total_price", type = Long.class),
                                         @ColumnResult(name = "size", type = Integer.class),
-                                        @ColumnResult(name = "color", type = Integer.class),
+                                        @ColumnResult(name = "color_id", type = Long.class),
                                         @ColumnResult(name = "product_name", type = String.class),
                                         @ColumnResult(name = "product_img", type = String.class)
                                 }
@@ -33,6 +36,8 @@ import java.sql.Timestamp;
                                 targetClass = OrderDetailDTO.class,
                                 columns = {
                                         @ColumnResult(name = "id", type = Long.class),
+                                        @ColumnResult(name = "product_id", type = String.class),
+                                        @ColumnResult(name = "code", type = String.class),
                                         @ColumnResult(name = "total_price", type = Long.class),
                                         @ColumnResult(name = "product_price", type = Long.class),
                                         @ColumnResult(name = "receiver_name", type = String.class),
@@ -40,7 +45,7 @@ import java.sql.Timestamp;
                                         @ColumnResult(name = "receiver_address", type = String.class),
                                         @ColumnResult(name = "status", type = Integer.class),
                                         @ColumnResult(name = "size", type = Integer.class),
-                                        @ColumnResult(name = "color", type = Integer.class),
+                                        @ColumnResult(name = "color_id", type = Long.class),
                                         @ColumnResult(name = "product_name", type = String.class),
                                         @ColumnResult(name = "product_img", type = String.class)
                                 }
@@ -51,18 +56,18 @@ import java.sql.Timestamp;
 @NamedNativeQuery(
         name = "getListOrderOfPersonByStatus",
         resultSetMapping = "orderInfoDTO",
-        query = "SELECT od.id, od.total_price, od.size,pv.color, p.name product_name, (p.images ->> '$[0]') as product_img " +
+        query = "SELECT od.id,od.product_id,od.code, od.total_price, od.size,c.id as color_id, p.name product_name, (p.images ->> '$[0]') as product_img " +
                 "FROM orders od " +
                 "INNER JOIN product p " +
                 "ON od.product_id = p.id " +
-                "JOIN color c ON c.id = od.color_id" +
+                "JOIN color c ON c.id = od.color_id " +
                 "WHERE od.status = ?1 " +
                 "AND od.buyer =?2"
 )
 @NamedNativeQuery(
         name = "userGetDetailById",
         resultSetMapping = "orderDetailDto",
-        query = "SELECT orders.id, orders.total_price, orders.size,orders.color_id, product.name product_name, orders.price as product_price, " +
+        query = "SELECT orders.id, orders.product_id, orders.code, orders.total_price, orders.size,orders.color_id, product.name product_name, orders.price as product_price, " +
                 "orders.receiver_name, orders.receiver_phone, orders.receiver_address, orders.status, " +
                 "product.images ->> \"$[0]\" as product_img " +
                 "FROM orders " +
@@ -80,25 +85,36 @@ import java.sql.Timestamp;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
+
+    private String code;
+
     @Column(name = "receiver_name")
     private String receiverName;
+
     @Column(name = "receiver_phone")
     private String receiverPhone;
+
+    @Column(name = "receiver_email")
+    private String receiverEmail;
+
     @Column(name = "receiver_address")
     private String receiverAddress;
-    @Column(name = "note")
+
     private String note;
-    @Column(name = "price")
-    private long price;
+
+    private BigDecimal price;
+
     @Column(name = "total_price")
-    private long totalPrice;
-    @Column(name = "size")
-    private int size;
-    @Column(name = "color")
-    private int color;
-    @Column(name = "quantity")
-    private int quantity;
+    private BigDecimal totalPrice;
+
+    private Integer size;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "color_id", nullable = false)
+    private Color color;
+
+    private Integer quantity;
 
     @ManyToOne
     @JoinColumn(name = "buyer")
@@ -108,8 +124,7 @@ public class Order {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(name = "status")
-    private int status;
+    private Integer status;
 
     @Column(name = "created_at")
     private Timestamp createdAt;
@@ -137,11 +152,11 @@ public class Order {
 
         private String couponCode;
 
-        private int discountType;
+        private Integer discountType;
 
-        private long discountValue;
+        private Long discountValue;
 
-        private long maximumDiscountValue;
+        private Long maximumDiscountValue;
     }
 
 }

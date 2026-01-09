@@ -45,11 +45,11 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <a href="/admin/posts/create" id="addToTable" class="btn btn-primary">Thêm mới bài viết <i
+                        <a href="/admin/posts/create" id="addToTable" class="btn btn-success">Thêm mới bài viết <i
                                 class="fas fa-plus"></i></a>
-                        <a href="/admin/posts" class="btn btn-primary">Refresh <i
+                        <a href="/admin/posts" class="btn btn-secondary">Tải lại <i
                                 class="fas fa-redo-alt"></i></a>
-                        <button id="btn-search" class="btn btn-primary">Tìm kiếm <i
+                        <button id="btn-search" class="btn btn-outline-primary">Tìm kiếm <i
                                 class="fas fa-search"></i></button>
                     </div>
                 </div>
@@ -97,7 +97,7 @@
                         </th:block>
                         <td th:text="${#dates.format(post.createdAt, 'dd-MM-yyyy')}"></td>
                         <td th:text="${#dates.format(post.publishedAt, 'dd-MM-yyyy')}"></td>
-                        <td class="actions">
+                        <td class="actions center">
                             <a th:href="@{/admin/posts/{slug}/{id}(id=${post.id},slug=${post.slug})}" class="on-default edit-row"><i class="fas fa-pencil-alt"></i></a>
                             <a href="#" th:data-id="${post.id}" class="on-default remove-row btn-delete-post"><i class="far fa-trash-alt"></i></a>
                         </td>

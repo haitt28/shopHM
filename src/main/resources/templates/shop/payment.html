@@ -107,6 +107,12 @@
                             </div><!-- End .form-group -->
 
                             <div class="form-group required-field">
+                                <label>Email </label>
+                                <input type="text" class="form-control" th:value="${user_email}" name="receiver_email" id="receiver_email">
+                                <div class="invalid-feedback"></div>
+                            </div><!-- End .form-group -->
+
+                            <div class="form-group required-field">
                                 <label>Địa chỉ nhận hàng</label>
                                 <textarea type="text" class="form-control" th:text="${user_address}" name="receiver_address" id="receiver_address" required></textarea>
                                 <div class="invalid-feedback"></div>
@@ -270,6 +276,7 @@
             debugger
             let receiverName = $('#receiver_name').val();
             let receiverPhone = $('#receiver_phone').val();
+            let receiverEmail = $('#receiver_email').val();
             let receiverAddress = $('#receiver_address').val();
             let notes = $('#notes').val();
             let isValid = true;
@@ -290,6 +297,13 @@
                 phoneInvalid = $('#in-user-phone').next();
                 phoneInvalid.css('display', 'block');
                 phoneInvalid.html('Số điện thoại không hợp lệ');
+                isValid = false;
+            }
+            let emailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailFormat.test(receiverEmail)) {
+                let emailInvalid = $('#in-user-email').next();
+                emailInvalid.css('display', 'block');
+                emailInvalid.html('Email không hợp lệ');
                 isValid = false;
             }
             if (receiverAddress.length == 0) {
@@ -313,6 +327,7 @@
                     color:color,
                     receiver_name: receiverName,
                     receiver_phone: receiverPhone,
+                    receiver_email:receiverEmail,
                     receiver_address: receiverAddress,
                     coupon_code: couponCode,
                     total_price: totalPrice,

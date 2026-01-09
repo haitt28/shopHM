@@ -5,10 +5,7 @@ import com.hmshop.application.model.request.CreateProductRequest;
 import com.hmshop.application.model.request.CreateSizeCountRequest;
 import com.hmshop.application.model.request.UpdateFeedBackRequest;
 import com.hmshop.application.config.security.CustomUserDetails;
-import com.hmshop.application.service.BrandService;
-import com.hmshop.application.service.CategoryService;
-import com.hmshop.application.service.ImageService;
-import com.hmshop.application.service.ProductService;
+import com.hmshop.application.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -29,7 +26,10 @@ import javax.validation.Valid;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.hmshop.application.Constant.Constant.*;
 
@@ -48,6 +48,9 @@ public class ProductController {
     private final BrandService brandService;
     private final CategoryService categoryService;
     private final ImageService imageService;
+    private final ProductVariantService variantService;
+    private final ColorService colorService;
+
 
     @GetMapping("/admin/products")
     public String homePages(Model model,
@@ -63,13 +66,16 @@ public class ProductController {
         //Lấy danh sách danh mục
         List<Category> categories = categoryService.getListCategories();
         model.addAttribute("categories", categories);
-        List<String> colors = List.of(
-                "Black", "White", "Gray",
-                "Red", "Blue", "Green", "Yellow",
-                "Beige", "Cream", "Brown", "Navy", "Khaki",
-                "Pink", "Purple", "Orange"
-        );
-        model.addAttribute("colors",colors);
+
+        List<ProductVariant> productVariants = variantService.getAllProductVariants();
+        Map<String, Integer> productQuantityMap =
+                productVariants.stream()
+                        .collect(Collectors.groupingBy(
+                                ProductVariant::getProductId,
+                                HashMap::new,
+                                Collectors.summingInt(ProductVariant::getQuantity)
+                        ));
+        model.addAttribute("productQuantityMap", productQuantityMap);
         //Lấy danh sách sản phẩm
         Page<Product> products = productService.adminGetListProduct(id, name, category, brand, page);
         model.addAttribute("products", products.getContent());
@@ -116,9 +122,10 @@ public class ProductController {
         List<Brand> brands = brandService.getListBrand();
         model.addAttribute("brands", brands);
 
+        List<Color> colors = colorService.getListColor();
         //Lấy danh sách options
         model.addAttribute("sizes", PRODUCT_SIZE);
-        model.addAttribute("colors", PRODUCT_COLOR);
+        model.addAttribute("colors", colors);
         model.addAttribute("sizeMap", PRODUCT_SIZE_MAP);
         model.addAttribute("colorMap", PRODUCT_COLOR_MAP);
 
@@ -265,12 +272,10 @@ public class ProductController {
                     productBrandValue.setCellStyle(bodyCellStyle);
 
                     XSSFCell priceValue = bodyRow.createCell(3);
-                    priceValue.setCellValue(product.getPrice());
-                    priceValue.setCellStyle(bodyCellStyle);
+                    priceValue.setCellValue(product.getPrice().doubleValue());
 
                     XSSFCell priceSellValue = bodyRow.createCell(4);
-                    priceSellValue.setCellValue(product.getSalePrice());
-                    priceSellValue.setCellStyle(bodyCellStyle);
+                    priceSellValue.setCellValue(product.getSalePrice().doubleValue());
 
                     CreationHelper creationHelper = workbook.getCreationHelper();
                     CellStyle cellStyle = workbook.createCellStyle();

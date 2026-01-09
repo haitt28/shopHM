@@ -6,9 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.math.BigDecimal;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,16 +18,14 @@ public class UpdateDetailOrder {
     @JsonProperty("product_id")
     private String productId;
 
-    @Min(value = 35)
-    @Max(value = 42)
     private int size;
 
     @JsonProperty("coupon_code")
     private String couponCode;
 
     @JsonProperty("total_price")
-    private long totalPrice;
+    private BigDecimal totalPrice;
 
     @JsonProperty("product_price")
-    private long productPrice;
+    private BigDecimal productPrice;
 }

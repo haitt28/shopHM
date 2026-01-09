@@ -5,9 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -17,8 +16,8 @@ import javax.persistence.Id;
 public class Color {
 
     @Id
-    @Column(name = "id")
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -26,5 +25,12 @@ public class Color {
     @Column(name = "code")
     private String code;
 
-    // getters & setters
+    @Column(name = "status",columnDefinition = "BOOLEAN")
+    private boolean status;
+
+    @Column(name = "created_at")
+    private Timestamp createdAt;
+
+    @Column(name = "modified_at")
+    private Timestamp modifiedAt;
 }

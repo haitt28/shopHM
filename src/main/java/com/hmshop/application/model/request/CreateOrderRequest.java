@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
+import java.math.BigDecimal;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,7 +21,7 @@ public class CreateOrderRequest {
 
     private Integer size;
 
-    private Integer Color;
+    private Long Color;
 
     @NotBlank(message = "Họ tên trống")
     @JsonProperty("receiver_name")
@@ -29,6 +30,14 @@ public class CreateOrderRequest {
     @Pattern(regexp="(09|03|07|08|05)+([0-9]{8})\\b", message = "Điện thoại không hợp lệ")
     @JsonProperty("receiver_phone")
     private String receiverPhone;
+
+    @Pattern(
+            regexp = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$",
+            message = "Email không hợp lệ"
+    )
+    @JsonProperty("receiver_email")
+    private String receiverEmail;
+
 
     @NotNull(message = "Địa chỉ trống")
     @NotEmpty(message = "Địa chỉ trống")
@@ -39,10 +48,10 @@ public class CreateOrderRequest {
     private String couponCode;
 
     @JsonProperty("total_price")
-    private long totalPrice;
+    private BigDecimal totalPrice;
 
     @JsonProperty("product_price")
-    private long productPrice;
+    private BigDecimal productPrice;
 
     private String note;
 

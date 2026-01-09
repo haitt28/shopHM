@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface ProductService {
 
     //Lấy sản phẩm
@@ -67,7 +66,7 @@ public interface ProductService {
     List<ShortProductInfoDTO> getAvailableProducts();
 
     //Check size sản phẩm
-    boolean checkProductSizeAvailable(String id, int size, Integer color);
+    boolean checkProductSizeAvailable(String id, Integer size, Long color);
 
     //Kiểm tra sản phẩm có khuyến mại
     List<ProductInfoDTO> checkPublicCoupon(List<ProductInfoDTO> products);

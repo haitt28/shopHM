@@ -45,11 +45,11 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <a href="/admin/coupons/create" id="addToTable" class="btn btn-primary">Thêm mới khuyến mại <i
+                        <a href="/admin/coupons/create" id="addToTable" class="btn btn-success">Thêm mới khuyến mại <i
                                 class="fas fa-plus"></i></a>
-                        <a href="/admin/products" class="btn btn-primary">Refresh <i
+                        <a href="/admin/products" class="btn btn-secondary">Tải lại <i
                                 class="fas fa-redo-alt"></i></a>
-                        <button id="btn-search" class="btn btn-primary">Tìm kiếm <i
+                        <button id="btn-search" class="btn btn-outline-primary">Tìm kiếm <i
                                 class="fas fa-search"></i></button>
                     </div>
                 </div>
@@ -63,6 +63,7 @@
                     <th>Trạng thái</th>
                     <th>Giá trị</th>
                     <th>Ngày hết hạn</th>
+                    <th>Thao tác </th>
                 </tr>
                 <tr class="heading-search">
                     <form  method="GET" id="search-form">
@@ -96,10 +97,11 @@
                 <th:block th:each="Coupon : ${CouponPage}">
                     <tr>
                         <td>
-                            <a th:href="@{/admin/coupons/update/{id}(id=${Coupon.id})}"
-                               th:text="${Coupon.couponCode}"></a>
+                            <span th:text="${Coupon.couponCode}"></span>
                         </td>
-                        <td th:text="${Coupon.name}"></td>
+                        <td>
+                            <span th:text="${Coupon.name}"></span>
+                        </td>
                         <td>
                             <th:block th:if="${Coupon.public} == true">
                                <span class="badge badge-success">Công khai</span>
@@ -126,6 +128,9 @@
                         </td>
                         <td>
                             <span th:text="${#dates.format(Coupon.expiredAt, 'dd-MM-yyyy')}"></span>
+                        </td>
+                        <td class="actions center">
+                            <a th:href="@{/admin/coupons/update/{id}(id=${Coupon.id})}"><i class="fas fa-pencil-alt"></i></a>
                         </td>
                     </tr>
                 </th:block>

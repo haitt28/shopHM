@@ -17,29 +17,34 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant,L
     List<Integer> findAllSizeOfProduct(String id);
 
     List<ProductVariant> findByProductId(String id);
+    @Query(value = "SELECT * FROM product_variant", nativeQuery = true)
+    List<ProductVariant> getAllProductVariants();
 
     //Kiểm trả size sản phẩm
     @Query(value = "SELECT * FROM product_variant WHERE product_id = ?1 AND size = ?2 AND quantity >0", nativeQuery = true)
     ProductVariant checkProductAndSizeAvailable(String id, int size);
 
     //Kiểm trả size sản phẩm
-    @Query(value = "SELECT * FROM product_variant WHERE product_id = ?1 AND size = ?2 AND color = ?3 AND quantity >0", nativeQuery = true)
-    ProductVariant checkProductAndSizeAvailableV2(String id, int size,int color);
+    @Query(value = "SELECT * FROM product_variant WHERE product_id = ?1 AND size = ?2 AND color_id = ?3 AND quantity >0", nativeQuery = true)
+    ProductVariant checkProductAndSizeAvailableV2(String id, Integer size,Long color);
 
     //Trừ 1 sản phẩm theo size
     @Transactional
     @Modifying
     @Query(nativeQuery = true, value = "Update product_variant set quantity = quantity - 1 where product_id = ?1 and size = ?2")
-    public void minusOneProductBySize(String id, int size);
+    void minusOneProductBySize(String id, int size);
 
     //Cộng 1 sản phẩm theo size
     @Transactional
     @Modifying
     @Query(nativeQuery = true, value = "Update product_variant set quantity = quantity + 1 where product_id = ?1 and size = ?2")
-    public void plusOneProductBySize(String id, int size);
+    void plusOneProductBySize(String id, int size);
 
     @Transactional
     @Modifying
     @Query(nativeQuery = true, value = "Delete from product_variant where product_id = ?1")
-    public void deleteByProductId(String id);
+    void deleteByProductId(String id);
+
+    @Query(value = "SELECT COALESCE(SUM(quantity), 0) FROM product_variant WHERE product_id = ?1", nativeQuery = true)
+    long sumQuantityProduct(String productId);
 }

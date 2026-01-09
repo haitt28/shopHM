@@ -1,20 +1,19 @@
 package com.hmshop.application.service.impl;
 
+import com.hmshop.application.entity.Brand;
 import com.hmshop.application.exception.BadRequestException;
 import com.hmshop.application.exception.InternalServerException;
 import com.hmshop.application.exception.NotFoundException;
 import com.hmshop.application.model.mapper.BrandMapper;
+import com.hmshop.application.model.request.CreateBrandRequest;
 import com.hmshop.application.repository.BrandRepository;
 import com.hmshop.application.service.BrandService;
-import com.hmshop.application.entity.Brand;
-import com.hmshop.application.model.request.CreateBrandRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -22,7 +21,7 @@ import java.util.Optional;
 
 import static com.hmshop.application.Constant.Constant.LIMIT_BRAND;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class BrandServiceImpl implements BrandService {
 

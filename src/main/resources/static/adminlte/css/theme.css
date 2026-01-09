@@ -6581,8 +6581,8 @@ html.sidebar-light:not(.dark) ul.nav-main li .nav-children li a:hover, html.side
 }
 
 .btn-primary {
-    background-color: #ccc;
-    border-color: #ccc #ccc #b3b3b3;
+    background-color: #007bff;
+    border-color: #007bff;
     color: #fff
 }
 
@@ -15165,7 +15165,7 @@ html.dark .note-editor .caret {
 }
 
 .table .actions, .table .actions-hover {
-    vertical-align: middle
+    /*vertical-align: middle*/
 }
 
 .table .actions a, .table .actions-hover a {

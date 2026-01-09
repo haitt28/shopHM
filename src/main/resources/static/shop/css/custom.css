@@ -811,13 +811,6 @@ input[type=radio] + label .radio-dot:before {
     border-radius: 4px;
 }
 .btn-primary.clear-filter {
-    border: none;
-    background-color: #333333;
-    color: #ffffff;
-    /*padding:  1.85rem 4.2rem;*/
-    /*line-height: 2.1875rem;*/
-    /*text-transform: uppercase;*/
-    /*margin-bottom: 12px;*/
     border-radius: 5px;
 }
 
@@ -1029,7 +1022,6 @@ input[type=radio] + label .radio-dot:before {
 
 /* Title 2 dòng */
 .product-title {
-    min-height: 48px;
     line-height: 1.2;
     overflow: hidden;
 

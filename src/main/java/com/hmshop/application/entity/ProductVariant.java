@@ -22,8 +22,8 @@ import javax.persistence.*;
 public class ProductVariant {
 
     @Id
-    @Column(name = "id", length = 36)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "product_id", nullable = false)
     private String productId;

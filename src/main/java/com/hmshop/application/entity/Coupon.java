@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 public class Coupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column(name = "name",nullable = false,length = 300)
     private String name;
     @Column(name = "coupon_code",unique = true)

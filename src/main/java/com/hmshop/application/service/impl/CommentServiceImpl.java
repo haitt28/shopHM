@@ -11,10 +11,11 @@ import com.hmshop.application.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 

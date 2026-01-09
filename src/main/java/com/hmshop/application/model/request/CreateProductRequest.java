@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +36,12 @@ public class CreateProductRequest {
     @Min(1000)
     @Max(1000000000)
     @NotNull(message = "Giá sản phẩm trống!")
-    private Long price;
+    private BigDecimal price;
 
     @Min(1000)
     @Max(1000000000)
     @NotNull(message = "Giá bán sản phẩm trống!")
-    private Long salePrice;
+    private BigDecimal salePrice;
 
     @NotNull(message = "Danh sách ảnh trống!")
     @JsonProperty("product_images")

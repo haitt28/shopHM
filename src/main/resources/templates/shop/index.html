@@ -122,7 +122,7 @@
                             </th:block>
                         </div><!-- End .price-box -->
                         <div class="ratings-container">
-                            <p class="card-text sold">&Dstrok;&atilde; b&aacute;n <span th:text="${newProduct.totalSold}"></span> &dstrok;&ocirc;i</p>
+                            <p class="card-text sold">&Dstrok;&atilde; b&aacute;n <span th:text="${newProduct.totalSold}"></span> </p>
                         </div><!-- End .product-container -->
 <!--                        <div class="product-action">-->
 <!--                            <a href="#" class="btn-icon-wish"><i class="icon-heart"></i></a>-->
@@ -173,7 +173,7 @@
                             </th:block>
                         </div><!-- End .price-box -->
                         <div class="ratings-container">
-                            <p class="card-text sold">&Dstrok;&atilde; b&aacute;n <span th:text="${sell.totalSold}"></span> &dstrok;&ocirc;i</p>
+                            <p class="card-text sold">&Dstrok;&atilde; b&aacute;n <span th:text="${sell.totalSold}"></span> </p>
                         </div><!-- End .product-container -->
 <!--                        <div class="product-action">-->
 <!--                            <a href="#" class="btn-icon-wish"><i class="icon-heart"></i></a>-->
@@ -215,9 +215,6 @@
                                 <span class="product-price" th:text="${#numbers.formatDecimal(view.price, 0, 'COMMA', 0, 'POINT') +' đ'}"></span>
                             </th:block>
                         </div><!-- End .price-box -->
-                        <div class="ratings-container">
-                            <p class="card-text sold">&Dstrok;&atilde; b&aacute;n <span th:text="${view.totalSold}"></span> &dstrok;&ocirc;i</p>
-                        </div><!-- End .product-container -->
                         <div class="ratings-container">
                             <p class="card-text sold">Số lượt xem: <span th:text="${view.views}"></span></p>
                         </div><!-- End .product-container -->

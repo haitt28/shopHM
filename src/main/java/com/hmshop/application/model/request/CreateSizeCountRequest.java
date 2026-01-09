@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 public class CreateSizeCountRequest {
     private int size;
-    private int color;
+    private Long color;
     @Min(0)
     private int count;
     @NotEmpty(message = "Mã sản phẩm trống")

@@ -20,5 +20,7 @@ public interface MetricsRepository extends JpaRepository<Metrics, Long> {
     @Query(value = "SELECT * FROM metrics  WHERE date_format(created_at,'%Y-%m-%d') = date_format(NOW(),'%Y-%m-%d')",nativeQuery = true)
     Metrics findByCreatedAT();
 
+    @Query(value = "DELETE FROM metrics WHERE order_id = ?1", nativeQuery = true)
+    void deleteByOrderId(Long orderId);
 
 }

@@ -15,14 +15,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
 import static com.hmshop.application.Constant.Constant.DISCOUNT_PERCENT;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class CouponServiceImpl implements CouponService {
 
@@ -68,7 +71,7 @@ public class CouponServiceImpl implements CouponService {
         //Check có khuyến mại nào đang chạy hay chưa
 
         if (createCouponRequest.isPublic() && createCouponRequest.isActive()) {
-            Coupon alreadyCoupon = couponRepository.checkHasPublicCoupon();
+            Coupon alreadyCoupon = couponRepository.checkHasPublicCouponV2();
             if (alreadyCoupon != null) {
                 throw new BadRequestException("Chương trình khuyến mãi công khai \"" + alreadyCoupon.getCouponCode() + "\" đang chạy. Không thể tạo mới");
             }
@@ -115,7 +118,7 @@ public class CouponServiceImpl implements CouponService {
 
         //Check có khuyến mại nào đang chạy hay không
         if (createCouponRequest.isActive() && createCouponRequest.isPublic()) {
-            Coupon alreadyCoupon = couponRepository.checkHasPublicCoupon();
+            Coupon alreadyCoupon = couponRepository.checkHasPublicCouponV2();
             if (alreadyCoupon != null) {
                 throw new BadRequestException("Chương trình khuyến mãi công khai \"" + alreadyCoupon.getCouponCode() + "\" đang chạy. Không thể tạo mới");
             }
@@ -185,20 +188,36 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Override
-    public long calculateCouponPrice(long price, Coupon Coupon) {
-        long discountValue = Coupon.getMaximumDiscountValue();
-        long tmp = Coupon.getDiscountValue();
-        if (Coupon.getDiscountType() == DISCOUNT_PERCENT) {
-            tmp = price * Coupon.getDiscountValue() / 100;
+    public BigDecimal calculateCouponPrice(BigDecimal price, Coupon coupon) {
+
+        if (price == null || coupon == null) {
+            return BigDecimal.ZERO;
         }
-        if (tmp < discountValue) {
-            discountValue = tmp;
+
+        BigDecimal discountAmount = BigDecimal.ZERO;
+        BigDecimal maxDiscount = BigDecimal.valueOf(coupon.getMaximumDiscountValue());
+
+        if (coupon.getDiscountType() == DISCOUNT_PERCENT) {
+            discountAmount = price
+                    .multiply(BigDecimal.valueOf(coupon.getDiscountValue()))
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        } else {
+            discountAmount = BigDecimal.valueOf(coupon.getDiscountValue());
         }
-        long CouponPrice = price - discountValue;
-        if (CouponPrice < 0) {
-            CouponPrice = 0;
+
+        // apply max discount
+        if (discountAmount.compareTo(maxDiscount) > 0) {
+            discountAmount = maxDiscount;
         }
-        return CouponPrice;
+
+        BigDecimal finalPrice = price.subtract(discountAmount);
+
+        // price không âm
+        if (finalPrice.compareTo(BigDecimal.ZERO) < 0) {
+            finalPrice = BigDecimal.ZERO;
+        }
+
+        return finalPrice;
     }
 
     @Override

@@ -45,13 +45,13 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <a href="/admin/products/create" id="addToTable" class="btn btn-info">Thêm mới sản phẩm <i
+                        <a href="/admin/products/create" id="addToTable" class="btn btn-success">Thêm mới sản phẩm <i
                                 class="fas fa-plus"></i></a>
-                        <a href="/admin/products" class="btn btn-primary">Refresh <i
+                        <a href="/admin/products" class="btn btn-secondary">Tải lại <i
                                 class="fas fa-redo-alt"></i></a>
-                        <button id="btn-search" class="btn btn-success">Tìm kiếm <i
+                        <button id="btn-search" class="btn btn-outline-primary">Tìm kiếm <i
                                 class="fas fa-search"></i></button>
-                        <button class="btn btn-warning btn_export"><a th:href="@{/api/products/export/excel}">Xuất dữ liệu</a>
+                        <button class="btn btn btn-warning btn_export"><a th:href="@{/api/products/export/excel}">Xuất dữ liệu</a>
                             <i class="fas fa-file-export"></i></button>
 <!--                        <button id="btn-delete" onclick="warningBeforeDelete()" type="button" class="btn btn-danger" disabled>Xóa sản phẩm  <i-->
 <!--                                class="fas fa-trash-alt"></i></button>-->
@@ -69,6 +69,7 @@
                     <th>Danh mục</th>
                     <th>Giá nhập</th>
                     <th>Giá bán</th>
+                    <th>Số lượng</th>
                     <th>Ngày tạo</th>
                     <th>Ngày sửa</th>
                     <th>Đã bán</th>
@@ -126,10 +127,11 @@
                         </td>
                         <td class="money" th:text="${product.price}"></td>
                         <td class="money" th:text="${product.salePrice}"></td>
+                        <td th:text="${productQuantityMap[product.id]}"></td>
                         <td th:text="${#dates.format(product.createdAt, 'dd-MM-yyyy')}"></td>
                         <td th:text="${#dates.format(product.modifiedAt, 'dd-MM-yyyy')}"></td>
                         <td th:text="${product.totalSold}"></td>
-                        <td class="actions">
+                        <td class="actions center">
                             <a th:href="@{/admin/products/{slug}/{id}(id=${product.id}, slug=${product.slug})}" class="on-default edit-row"><i class="fas fa-pencil-alt"></i></a>
                             <a href="#" th:data-id="${product.id}" class="on-default remove-row delete-product"><i class="far fa-trash-alt"></i></a>
                         </td>

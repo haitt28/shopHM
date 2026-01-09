@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface BrandService {
     Page<Brand> adminGetListBrands(String id, String name, String status, Integer page);
 

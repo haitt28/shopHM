@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @SqlResultSetMappings(
@@ -29,13 +30,36 @@ import java.sql.Timestamp;
 @NamedNativeQuery(
         name = "getMetrics30Day",
         resultSetMapping = "metricsDTO",
-        query = "SELECT s.sales, s.profit, s.quantity, date_format(s.created_at,'%Y-%m-%d') as createdAt FROM Metrics s WHERE date_format(s.created_at,'%Y-%m-%d') BETWEEN DATE_SUB(NOW(), INTERVAL 30 DAY) AND NOW() ORDER BY createdAt ASC "
+        query = """
+        SELECT
+            DATE(s.created_at)        AS createdAt,
+            SUM(s.sales)              AS sales,
+            SUM(s.profit)             AS profit,
+            SUM(s.quantity)           AS quantity
+        FROM metrics s
+        WHERE s.created_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        GROUP BY DATE(s.created_at)
+        ORDER BY createdAt ASC
+    """
 )
+
 @NamedNativeQuery(
         name = "getMetricsDayByDay",
         resultSetMapping = "metricsDTO",
-        query = "SELECT s.sales, s.profit, s.quantity, date_format(s.created_at,'%Y-%m-%d') as createdAt FROM Metrics s WHERE date_format(s.created_at,'%Y-%m-%d') >=?1 AND date_format(s.created_at,'%Y-%m-%d') <=?2 ORDER BY createdAt ASC "
+        query = """
+        SELECT
+            DATE(s.created_at)  AS createdAt,
+            SUM(s.sales)        AS sales,
+            SUM(s.profit)       AS profit,
+            SUM(s.quantity)     AS quantity
+        FROM metrics s
+        WHERE s.created_at >= ?1
+          AND s.created_at <  DATE_ADD(?2, INTERVAL 1 DAY)
+        GROUP BY DATE(s.created_at)
+        ORDER BY createdAt ASC
+    """
 )
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
@@ -47,9 +71,9 @@ public class Metrics {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "sales")
-    private long sales;
+    private BigDecimal sales;
     @Column(name = "profit")
-    private long profit;
+    private BigDecimal profit;
     @Column(name = "quantity")
     private int quantity;
     @ManyToOne(fetch = FetchType.LAZY)

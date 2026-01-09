@@ -8,7 +8,6 @@ import com.hmshop.application.config.security.CustomUserDetails;
 import com.hmshop.application.service.BrandService;
 import com.hmshop.application.service.ImageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;

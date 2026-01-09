@@ -22,8 +22,11 @@ public interface CouponRepository extends JpaRepository<Coupon,Long> {
     Page<Coupon> adminGetListCoupon(String code, String name, String publish, String active, Pageable pageable);
 
     //Kiểm tra có khuyến mại đang chạy
-    @Query(nativeQuery = true, value = "SELECT * FROM Coupon p WHERE p.is_active = true AND p.is_public = true AND expired_at > now()")
+    @Query(nativeQuery = true, value = "SELECT * FROM Coupon p WHERE p.is_active = true AND p.is_public = true AND DATE(p.expired_at) >= CURDATE()")
     Coupon checkHasPublicCoupon();
+
+    @Query(nativeQuery = true, value = "SELECT * FROM Coupon p WHERE p.is_active = true AND p.is_public = true AND DATE(p.expired_at) >= CURDATE()")
+    Coupon checkHasPublicCouponV2();
 
     //Lấy khuyến mại theo mã code
     Optional<Coupon> findByCouponCode(String code);
@@ -33,7 +36,7 @@ public interface CouponRepository extends JpaRepository<Coupon,Long> {
     Coupon checkCoupon(String code);
 
     //Lấy khuyến mại đang chạy và còn thời hạn
-    @Query(nativeQuery = true,value = "SELECT * FROM  Coupon p WHERE p.expired_at > now() AND p.is_active = true")
+    @Query(nativeQuery = true,value = "SELECT * FROM  Coupon p WHERE p.expired_at >= now() AND p.is_active = true")
     List<Coupon> getAllValidCoupon();
 
 }

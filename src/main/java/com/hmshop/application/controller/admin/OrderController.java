@@ -1,9 +1,7 @@
 package com.hmshop.application.controller.admin;
 
 import com.hmshop.application.config.security.CustomUserDetails;
-import com.hmshop.application.entity.Coupon;
-import com.hmshop.application.entity.Order;
-import com.hmshop.application.entity.User;
+import com.hmshop.application.entity.*;
 import com.hmshop.application.exception.BadRequestException;
 import com.hmshop.application.model.dto.OrderDetailDTO;
 import com.hmshop.application.model.dto.OrderInfoDTO;
@@ -11,20 +9,22 @@ import com.hmshop.application.model.dto.ShortProductInfoDTO;
 import com.hmshop.application.model.request.CreateOrderRequest;
 import com.hmshop.application.model.request.UpdateDetailOrder;
 import com.hmshop.application.model.request.UpdateStatusOrderRequest;
-import com.hmshop.application.service.CouponService;
-import com.hmshop.application.service.OrderService;
-import com.hmshop.application.service.ProductService;
+import com.hmshop.application.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.hmshop.application.Constant.Constant.*;
 
@@ -35,6 +35,9 @@ public class OrderController {
     private final OrderService orderService;
     private final ProductService productService;
     private final CouponService couponService;
+    private final ProductVariantService variantService;
+    private final ColorService colorService;
+
 
     @GetMapping("/admin/orders")
     public String getListOrderPage(Model model,
@@ -108,9 +111,12 @@ public class OrderController {
                     Coupons.add(new Coupon(order.getCoupon()));
                 }
             }
+            boolean sizeIsAvailable = false;
+            if (ObjectUtils.isEmpty(order.getColor())) {
+                // Check size available
+                sizeIsAvailable = productService.checkProductSizeAvailable(order.getProduct().getId(), order.getSize(), order.getColor().getId());
+            }
 
-            // Check size available
-            boolean sizeIsAvailable = productService.checkProductSizeAvailable(order.getProduct().getId(), order.getSize(),order.getColor());
             model.addAttribute("sizeIsAvailable", sizeIsAvailable);
         }
         model.addAttribute("sizeMap", PRODUCT_SIZE_MAP);
@@ -139,9 +145,17 @@ public class OrderController {
         //Get list order pending
         User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
         List<OrderInfoDTO> orderList = orderService.getListOrderOfPersonByStatus(ORDER_STATUS, user.getId());
+        List<Color> colors = colorService.getListColor();
+        Map<Long, String> colorMap = Optional.ofNullable(colors)
+                .orElse(Collections.emptyList())
+                .stream()
+                .collect(Collectors.toMap(
+                        Color::getId,
+                        Color::getName
+                ));
         model.addAttribute("orderList", orderList);
         model.addAttribute("sizeMap", PRODUCT_SIZE_MAP);
-        model.addAttribute("colorMap", PRODUCT_COLOR_MAP);
+        model.addAttribute("colorMap", colorMap);
         return "shop/order_history";
     }
 
@@ -154,7 +168,21 @@ public class OrderController {
 
         User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
         List<OrderInfoDTO> orders = orderService.getListOrderOfPersonByStatus(status, user.getId());
+        List<Color> colors = colorService.getListColor();
+        Map<Long, String> colorMap = Optional.ofNullable(colors)
+                .orElse(Collections.emptyList())
+                .stream()
+                .collect(Collectors.toMap(
+                        Color::getId,
+                        Color::getName
+                ));
 
+        Map<Integer, String> sizeMap = PRODUCT_SIZE_MAP;
+
+        orders.forEach(order -> {
+            order.setSizeText(sizeMap.get(order.getSize()));
+            order.setColorText(colorMap.get(order.getColorId()));
+        });
         return ResponseEntity.ok(orders);
     }
 
@@ -166,9 +194,25 @@ public class OrderController {
         if (order == null) {
             return "error/404";
         }
+        List<ProductVariant> productVariants = productService.getListSizeOfProduct(order.getProductId());
+        // ===== SAFE NULL / EMPTY =====
+        if (productVariants == null || productVariants.isEmpty()) {
+            model.addAttribute("availableSizes", List.of());
+            model.addAttribute("availableColors", List.of());
+            model.addAttribute("notFoundSize", true);
+        }
+        List<Color> colors = colorService.getListColor();
+        Map<Long, String> colorMap = Optional.ofNullable(colors)
+                .orElse(Collections.emptyList())
+                .stream()
+                .collect(Collectors.toMap(
+                        Color::getId,
+                        Color::getName
+                ));
+
         model.addAttribute("order", order);
         model.addAttribute("sizeMap", PRODUCT_SIZE_MAP);
-        model.addAttribute("colorMap", PRODUCT_COLOR_MAP);
+        model.addAttribute("colorMap", colorMap);
         if (order.getStatus() == ORDER_STATUS) {
             model.addAttribute("canCancel", true);
         } else {

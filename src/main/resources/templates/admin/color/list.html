@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{/layout/layout_admin :: main-fragment(
+                                                ~{:: title},
+                                                'header',
+                                                'sidebar',
+                                                ~{:: #css-resources},
+                                                ~{:: #js-resources},
+                                                ~{:: #main-content}
+                                               )}">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách màu sắc</title>
+    <th:block id="css-resources">
+        <link rel="stylesheet" th:href="@{/adminlte/pagination/simplePagination.css}">
+    </th:block>
+</head>
+<body>
+<section role="main" class="content-body" id="main-content">
+    <header class="page-header">
+        <!--        <h2>Editable Tables</h2>-->
+        <div class="right-wrapper text-right">
+            <ol class="breadcrumbs">
+                <li>
+                    <a href="index.html">
+                        <i class="bx bx-home-alt"></i>
+                    </a>
+                </li>
+                <li><span>Danh sách màu sắc</span></li>
+            </ol>
+            <a class="sidebar-right-toggle" data-open="sidebar-right"><i
+                    class="fas fa-chevron-left"></i></a>
+        </div>
+    </header>
+    
+    <section class="card">
+        <header class="card-header">
+            <div class="card-actions">
+                <a href="#" class="card-action card-action-toggle" data-card-toggle></a>
+                <a href="#" class="card-action card-action-dismiss" data-card-dismiss></a>
+            </div>
+            <h2 class="card-title">Danh sách màu sắc</h2>
+        </header>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <button id="#modal-add-new-color" class="btn btn-success" data-toggle="modal"
+                                data-target="#modal-add-new-color">Thêm mới màu sắc <i
+                                class="fas fa-plus"></i></button>
+                        <a href="/admin/products" class="btn btn-secondary">Tải lại <i
+                                class="fas fa-redo-alt"></i></a>
+                        <button id="btn-search" class="btn btn-outline-primary">Tìm kiếm <i
+                                class="fas fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-bordered table-striped mb-0" id="datatable-editable">
+                <thead>
+                <tr>
+                    <th>Màu sắc</th>
+                    <th>Mã</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+                <tr class="heading-search">
+                    <form method="GET" id="search-form">
+                        <th>
+                            <input type="text" name="name" id="name" class="form-control search-input">
+                        </th>
+                        <th>
+                            <select name="publish" class="form-control search-select" id="publish">
+                                <option value="">Tất cả</option>
+                                <option value="0">Ẩn</option>
+                                <option value="1">Công khai</option>
+                            </select>
+                        </th>
+                        <th>
+                            <select name="active" class="form-control search-select" id="active">
+                                <option value="">Tất cả</option>
+                                <option value="0">Vô hiệu hóa</option>
+                                <option value="1">Kích hoạt</option>
+                            </select>
+                        </th>
+                        <th></th>
+                        <input type="hidden" name="page" id="page">
+                    </form>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="color : ${colors}">
+                    <tr data-item-id="1" th:attr="data-id = ${color.id}">
+                        <td class="category-name" th:data-id="${color.id}" th:text="${color.name}"></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span
+                                        th:style="'width:18px;height:18px;'
+                                     + 'background-color:' + ${color.code} + ';'
+                                     + 'border:1px solid #ccc;'">
+                                </span>
+                                <span th:text="${color.code}"></span>
+                            </div>
+                        </td>
+                        <th:block th:if="${color.status} == true">
+                            <td><label class="switch" style="margin-left: 60px;">
+                                <input type="checkbox" checked disabled>
+                                <span class="slider round"></span>
+                            </label></td>
+                        </th:block>
+                        <th:block th:if="${color.status} == false">
+                            <td><label class="switch" style="margin-left: 60px;">
+                                <input type="checkbox" disabled>
+                                <span class="slider round"></span>
+                            </label></td>
+                        </th:block>
+                        <td th:text="${#dates.format(color.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
+                        <td class="actions center">
+                            <a href="#" class="on-default edit-row edit-color" th:data-id="${color.id}"><i
+                                    class="fas fa-pencil-alt"></i></a>
+                            <a href="#" id="btn-delete-color" class="on-default remove-row delete-color"
+                               th:data-id="${color.id}"><i
+                                    class="far fa-trash-alt"></i></a>
+                        </td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+            <br>
+            <!-- Pagination -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination" id="pagination"></ul>
+            </nav>
+        </div>
+        
+        <!-- Modal add new color-->
+        <div class="modal fade" id="modal-add-new-color" tabindex="-1" role="dialog" aria-labelledby="modalAddNewColor"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Thêm màu sắc</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="required-label" for="new-color">Tên màu sắc</label>
+                            <input type="text" class="form-control" id="new-color">
+                            <span class="invalid-feedback" id="invalid-feedback-new-color">Độ dài tên màu sắc từ 1 - 50 ký tự</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="required-label" for="new-code">Mã màu</label>
+                            <input type="text" class="form-control" id="new-code">
+                        </div>
+                        
+                        <br>
+                        <label>Trạng thái</label>
+                        <br>
+                        <label class="switch">
+                            <input type="checkbox" id="new_status">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-primary btn-add-new-color">Thêm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal update color-->
+        <div class="modal fade" id="modal-update-color" tabindex="-1" role="dialog" aria-labelledby="modalUpdateColor"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Chỉnh sửa nhãn hiệu</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="required-label" for="update-color">Tên màu sắc</label>
+                            <input type="text" class="form-control" id="update-color">
+                            <span class="invalid-feedback" id="invalid-feedback-update-color">Độ dài tên màu sắc từ 1 - 50 ký tự</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="required-label" for="update-code">Mã màu</label>
+                            <input type="text" class="form-control" id="update-code">
+                        </div>
+                        
+                        <br>
+                        <label>Trạng thái</label>
+                        <br>
+                        <label class="switch">
+                            <input type="checkbox" id="update_status">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-primary btn-update-color">Sửa</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </section>
+
+</section>
+
+<th:block id="js-resources">
+    <script type="text/javascript" th:src="@{/adminlte/pagination/jquery.simplePagination.js}"></script>
+    <script type="text/javascript" th:src="@{/adminlte/js/table.js}"></script>
+    <script type="text/javascript">
+        let name, code, publish, active, page;
+        $(function () {
+            let vars = parseUrl();
+            name = vars["name"] || ""
+            code = vars["code"] || ""
+            publish = vars["publish"] || ""
+            active = vars["active"] || ""
+            page = vars["page"] || "1"
+            
+            $('#name').val(name);
+            $('#code').val(code);
+            $('#publish').val(publish)
+            $('#active').val(active)
+            $('#page').val(page)
+            
+            pagination([[${totalPages}]], [[${currentPage}]])
+        });
+        
+        
+        $("#modal-add-new-color").on("hidden.bs.modal", function () {
+            closeModalInsertUpdate();
+        });
+        
+        $("#modal-update-color").on("hidden.bs.modal", function () {
+            closeModalInsertUpdate();
+        });
+        
+        function closeModalInsertUpdate() {
+            $('#new-color').val('');
+            $('#update-color').val('');
+            $('#update-color-id').val('');
+        }
+        
+        $('.btn-add-new-color').click(function () {
+            let newBrand = $('#new-color').val();
+            let newCode = $('#new-code').val();
+            let status = false;
+            if ($("#new_status").is(":checked")) {
+                status = true;
+            }
+            isValid = true;
+            
+            if (newBrand.length === 0) {
+                $('#invalid-feedback-new-color').show();
+                isValid = false;
+            }
+ 
+            if (isValid) {
+                req = {
+                    name: newBrand,
+                    code: newCode,
+                    status: status
+                }
+                var myJSON = JSON.stringify(req);
+                $.ajax({
+                    url: '/api/admin/colors/',
+                    type: 'POST',
+                    data: myJSON,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        toastr.success("Tạo màu sắc thành công");
+                        $('.modal').modal('hide');
+                        setTimeout(() => location.reload(), 500);
+                    },
+                    error: function (data) {
+                        toastr.warning(data.responseJSON.message);
+                    }
+                });
+            }
+        });
+        
+        let colorId;
+        $('.edit-color').click(function () {
+            colorId = $(this).data('id');
+            $.ajax({
+                url: "/api/admin/colors/" + colorId,
+                type: "GET",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $("#update-color").val(data.name);
+                    $("#update-code").val(data.code);
+                    if (data.status == 1) {
+                        $("#update_status").prop('checked', true)
+                    } else {
+                        $("#update_status").prop('checked', false)
+                    }
+                    $('#modal-update-color').modal('show');
+                }
+            })
+        });
+        
+        $(".btn-update-color").click(function (){
+            let updateBrand = $('#update-color').val();
+            let updateCode = $('#update-code').val();
+            let status = false;
+            if ($("#update_status").is(":checked")) {
+                status = true;
+            }
+            isValid = true;
+            
+            if (updateBrand.length === 0) {
+                $('#invalid-feedback-new-color').show();
+                isValid = false;
+            }
+            
+            if (isValid) {
+                req = {
+                    id:colorId,
+                    name: updateBrand,
+                    code: updateCode,
+                    status: status
+                }
+                var myJSON = JSON.stringify(req);
+                $.ajax({
+                    url: '/api/admin/colors/'+colorId,
+                    type: 'PUT',
+                    data: myJSON,
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        toastr.success("Sửa màu sắc thành công");
+                        $('.modal').modal('hide');
+                        setTimeout(() => location.reload(), 500);
+                    },
+                    error: function (data) {
+                        toastr.warning(data.responseJSON.message);
+                    }
+                });
+            }
+        })
+    </script>
+</th:block>
+</body>
+</html>

@@ -86,7 +86,7 @@ public class HomeController {
         model.addAttribute("brands",brands);
 
         // Lấy size có sẵn
-        List<ProductVariant> productVariants = productService.getListSizeOfProduct(id);
+        List<ProductVariant> productVariants = productService.getListSizeOfProduct(product.getId());
 
         // ===== SAFE NULL / EMPTY =====
         if (productVariants == null || productVariants.isEmpty()) {
@@ -103,8 +103,8 @@ public class HomeController {
                 .sorted()
                 .toList();
 
-        List<Integer> availableColors = productVariants.stream()
-                .map(ProductVariant::getColor)
+        List<Long> availableColors = productVariants.stream()
+                .map(v -> v.getColor() != null ? v.getColor().getId() : null)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
@@ -124,7 +124,7 @@ public class HomeController {
     }
 
     @GetMapping("/dat-hang")
-    public String getCartPage(Model model, @RequestParam String id,@RequestParam Integer size,@RequestParam Integer color){
+    public String getCartPage(Model model, @RequestParam String id,@RequestParam Integer size,@RequestParam Long color){
 
         //Lấy chi tiết sản phẩm
         DetailProductInfoDTO product;
@@ -155,8 +155,8 @@ public class HomeController {
                 .sorted()
                 .toList();
 
-        List<Integer> availableColors = productVariants.stream()
-                .map(ProductVariant::getColor)
+        List<Long> availableColors = productVariants.stream()
+                .map(v -> v.getColor() != null ? v.getColor().getId() : null)
                 .filter(Objects::nonNull)
                 .distinct()
                 .toList();
@@ -169,7 +169,7 @@ public class HomeController {
             notFoundSize = productVariants.stream()
                     .noneMatch(v ->
                             size.equals(v.getSize()) &&
-                                    color.equals(v.getColor())
+                                    color.equals(v.getColor().getId())
                     );
         }
 
@@ -255,7 +255,7 @@ public class HomeController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/api/tim-kiem")
+    @GetMapping("/san-pham/tim-kiem")
     public String searchProduct(Model model, @RequestParam(required = false) String keyword, @RequestParam(required = false) Integer page) {
 
         PageableDTO result = productService.searchProductByKeyword(keyword, page);

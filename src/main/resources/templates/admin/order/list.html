@@ -45,11 +45,11 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <a href="/admin/orders/create" id="addToTable" class="btn btn-primary">Thêm mới đơn hàng <i
-                                class="fas fa-plus"></i></a>
-                        <a href="/admin/orders" class="btn btn-primary">Refresh <i
+<!--                        <a href="/admin/orders/create" id="addToTable" class="btn btn-success">Thêm mới đơn hàng <i-->
+<!--                                class="fas fa-plus"></i></a>-->
+                        <a href="/admin/orders" class="btn btn-secondary">Tải lại <i
                                 class="fas fa-redo-alt"></i></a>
-                        <button id="btn-search" class="btn btn-primary">Tìm kiếm <i
+                        <button id="btn-search" class="btn btn-outline-primary">Tìm kiếm <i
                                 class="fas fa-search"></i></button>
                     </div>
                 </div>
@@ -64,6 +64,7 @@
                     <th width="20%">Sản phẩm</th>
                     <th>Ngày tạo</th>
                     <th>Ngày sửa</th>
+                    <th>Thao tác</th>
                 </tr>
                 <tr>
                 <tr class="heading-search">
@@ -85,15 +86,6 @@
                                 <option value="3">Đã giao hàng</option>
                                 <option value="4">Đơn hàng bị trả lại</option>
                                 <option value="5">Đơn hàng bị hủy</option>
-
-                            </select>
-                        </th>
-                        <th>
-                            <select name="product" class="form-control search-select" id="product">
-                                <option value="">Tất cả</option>
-                                <th:block th:each="product : ${productList}">
-                                    <option th:value="${product.id}" th:text="${product.name}"></option>
-                                </th:block>
                             </select>
                         </th>
                         <th></th>
@@ -106,9 +98,7 @@
                 <tbody>
                 <th:block th:each="order : ${orderPage}">
                     <tr>
-                        <td>
-                            <a th:href="@{/admin/orders/update/{id}(id=${order.id})}" th:text="${order.id}"></a>
-                        </td>
+                        <td th:text="${order.code}"></td>
                         <td th:text="${order.receiverName}"></td>
                         <td th:text="${order.receiverPhone}"></td>
                         <td>
@@ -124,6 +114,9 @@
                         </td>
                         <td>
                             <span th:text="${#dates.format(order.modifiedAt, 'dd-MM-yyyy HH:mm')}"></span>
+                        </td>
+                        <td class="actions center">
+                            <a th:href="@{/admin/orders/update/{id}(id=${order.id})}"><i class="fas fa-pencil-alt"></i></a>
                         </td>
                     </tr>
                 </th:block>

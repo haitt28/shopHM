@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -181,9 +182,9 @@ public class Product {
     @Column(name = "description",columnDefinition = "TEXT")
     private String description;
     @Column(name = "price")
-    private long price;
+    private BigDecimal price;
     @Column(name = "sale_price")
-    private long salePrice;
+    private BigDecimal salePrice;
     @Column(name = "slug",nullable = false)
     private String slug;
     @Type(type = "json")
